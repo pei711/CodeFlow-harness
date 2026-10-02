@@ -52,6 +52,10 @@ FORBIDDEN_PATHS = {
     "RELEASING.md",
     "ui-tui/CONTEXT.md",
 }
+ALLOWED_VISUAL_ASSETS = {
+    "docs/assets/codeflow-benchmark-results-en.png",
+    "docs/assets/codeflow-benchmark-results-zh.png",
+}
 ALLOWED_EVALUATION_DOCS = {
     "docs/evaluation/README.md",
     "docs/evaluation/runtime-scheduler-experiments.md",
@@ -157,7 +161,7 @@ def check_public_tree(root: Path, tracked_paths: Iterable[str] | None = None) ->
         elif path.parts[0] != ".github" and path.parts[0] not in ALLOWED_ROOT_DIRECTORIES:
             findings.append(f"unexpected root directory: {path.parts[0]}")
             continue
-        if path.suffix.lower() in FORBIDDEN_ASSET_SUFFIXES:
+        if path.suffix.lower() in FORBIDDEN_ASSET_SUFFIXES and relative not in ALLOWED_VISUAL_ASSETS:
             findings.append(f"forbidden binary or web asset: {relative}")
             continue
         if path.name == ".env" or path.suffix.lower() in FORBIDDEN_SECRET_SUFFIXES:

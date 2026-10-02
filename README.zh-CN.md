@@ -48,6 +48,12 @@ flowchart LR
     T --> E["Session · Tracing · Delivery"]
 ```
 
+## 测评结果概览
+
+> 数据摘自项目简历，来自不同负载与基线；各项只在自身测试范围内比较。
+
+![CodeFlow 项目测评图：任务调度、调用成本、记忆与上下文、工具调用和链路追踪](docs/assets/codeflow-benchmark-results-zh.png)
+
 ## 从安装到第一条真实回复
 
 CodeFlow 需要 Python 3.12。原生 TUI 使用 Node.js 22；系统缺少合适版本时，安装器

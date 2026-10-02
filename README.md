@@ -41,6 +41,12 @@ flowchart LR
     T --> E["Session · Tracing · Delivery"]
 ```
 
+## Evaluation highlights
+
+> Résumé-reported measurements from separate workloads and baselines; comparisons apply only within each stated test.
+
+![CodeFlow reported benchmark results: task scheduling, call efficiency, memory and context, tool execution, and tracing](docs/assets/codeflow-benchmark-results-en.png)
+
 ## From install to a real reply
 
 CodeFlow requires Python 3.12. The native TUI uses Node.js 22; the installer can
