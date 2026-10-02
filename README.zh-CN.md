@@ -21,10 +21,19 @@
 
 ---
 
-CodeFlow 是一套紧凑的 Agent Harness。不同入口不用各自实现 Agent Loop，而是把 Turn
-提交给同一套 Runtime。CodeFlow 负责调度、取消、Context 组装、工具执行、Session
-持久化、Tracing 和投递。外部 Memory Backend 可以接入这套 Runtime，但当前发布
-不包含外部 Memory 实现。
+## 项目介绍
+
+CodeFlow 是面向开发者的开源 Agent Runtime 与 Harness，帮助把模型调用、工具执行、
+上下文管理、会话持久化、任务调度和结果投递放进一条统一的运行链路。你可以在终端或
+原生 TUI 中与 Agent 协作，也可以通过 Gateway、定时任务和消息渠道运行它。
+
+不同入口共用同一套 Turn 契约和 Runtime，因此不需要为每种接入方式重复维护 Agent Loop。
+CodeFlow 负责任务调度与取消、Context 预算和组装、工具调用、Session 持久化、Tracing，
+以及结果交付；工具能力覆盖本地文件、Shell、Web、MCP 和 Sandbox。
+
+CodeFlow 也提供 CodeFlowBench，用来评估 Agent Runtime、Context、工具与记忆相关能力。
+外部 Memory Backend 可以按需接入；未配置时，系统会明确保持关闭状态。项目运行环境为
+Python 3.12，原生 TUI 使用 Node.js 22。
 
 ```mermaid
 flowchart LR
@@ -44,7 +53,7 @@ flowchart LR
 CodeFlow 需要 Python 3.12。原生 TUI 使用 Node.js 22；系统缺少合适版本时，安装器
 可以配置私有 Node Runtime。
 
-仓库处于 Private 阶段时，先使用已经配置好的 GitHub 凭证克隆，再运行安装器：
+克隆公开仓库后，在项目根目录运行安装器：
 
 ```bash
 git clone https://github.com/pei711/CodeFlow-harness.git
@@ -60,13 +69,13 @@ Set-Location CodeFlow-harness
 .\install.ps1
 ```
 
-安装器从 GitHub Release 解析 CodeFlow wheel，并默认使用国内 Python 与 Node.js 镜像。
-访问 Private Release 时设置 `CODEFLOW_GITHUB_TOKEN`；需要固定制品时，可以设置
+安装器可以从 GitHub Release 解析 CodeFlow wheel，并默认使用国内 Python 与 Node.js 镜像。
+访问私有仓库或受限 Release 时设置 `CODEFLOW_GITHUB_TOKEN`；需要固定制品时，可以设置
 `CODEFLOW_WHEEL_URL` 指向经过信任的 wheel。
 
 | 安装控制项 | 用途 |
 | --- | --- |
-| `CODEFLOW_GITHUB_TOKEN` | 读取 Private GitHub Release |
+| `CODEFLOW_GITHUB_TOKEN` | 读取私有仓库或受限 Release |
 | `CODEFLOW_WHEEL_URL` | 直接安装经过信任的 CodeFlow wheel |
 | `CODEFLOW_PYPI_INDEX` | 覆盖 Python 包索引 |
 | `CODEFLOW_NODE_MIRROR` | 覆盖 Node.js 下载镜像 |

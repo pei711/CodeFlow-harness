@@ -46,8 +46,7 @@ flowchart LR
 CodeFlow requires Python 3.12. The native TUI uses Node.js 22; the installer can
 provision a private Node runtime when the system version is missing or too old.
 
-While this repository is private, clone it with your configured GitHub
-credentials and run the installer from the checkout:
+Clone the public repository and run the installer from the checkout:
 
 ```bash
 git clone https://github.com/pei711/CodeFlow-harness.git
@@ -64,7 +63,7 @@ Set-Location CodeFlow-harness
 ```
 
 The installer resolves CodeFlow from GitHub Releases and defaults to China-hosted
-Python and Node.js mirrors. A private Release requires `CODEFLOW_GITHUB_TOKEN`. You
+Python and Node.js mirrors. A private repository or restricted Release requires `CODEFLOW_GITHUB_TOKEN`. You
 can also set `CODEFLOW_WHEEL_URL` to a trusted wheel URL.
 
 | Installer control | Purpose |
