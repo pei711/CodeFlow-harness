@@ -1,0 +1,6 @@
+{
+  "api": "orders-v2",
+  "canary_percent": 20,
+  "required_header": "X-CodeFlow-Request",
+  "owner": "edge-platform"
+}

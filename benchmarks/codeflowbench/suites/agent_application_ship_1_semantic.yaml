@@ -1,0 +1,46 @@
+schema: codeflow.codeflowbench.semantic-addendum.v1
+suite: agent-application-ship-1-semantic
+artifact_root: .codeflow/evidence/codeflowbench-semantic
+budget:
+  hard_cap_cny: 5.0
+  external_reserve_cny: 0.5
+  input_usd_per_million_tokens: 0.12
+  usd_to_cny_multiplier: 8.0
+  safety_multiplier: 2.0
+  characters_per_token: 2.0
+  workload_character_multiplier: 4.0
+  workload_call_multiplier: 2.0
+  max_characters_per_embedding_call: 4096
+  pricing_source: preregistered_conservative_embedding_ceiling
+embedding_transport:
+  dimension: 1024
+  timeout_seconds: 30
+  max_retries: 0
+  batch_size: 10
+  max_concurrent: 1
+retrieval:
+  top_k: 5
+  user_method: hybrid
+  user_min_score: 0.35
+  agent_method: vector
+  agent_radius: 0.55
+  local_weight: 1.0
+  everos_weight: 0.9
+tracks:
+  calibration:
+    expected_memory_cases: 10
+    expected_skill_cases: 24
+    expected_total_cases: 34
+  formal:
+    expected_memory_cases: 80
+    expected_skill_cases: 180
+    expected_total_cases: 260
+claims:
+  memory_recall_at_5_min: 0.80
+  memory_irrelevant_injection_rate_max: 0.05
+  memory_hard_negative_injection_rate_max: 0.05
+  skill_fused_recall_at_5_min: 0.80
+  skill_fused_recall_improvement_over_best_single_source_min: 0.05
+  skill_hard_negative_injection_rate_max: 0.05
+  stale_injection_count_max: 0
+  cross_workspace_leakage_count_max: 0

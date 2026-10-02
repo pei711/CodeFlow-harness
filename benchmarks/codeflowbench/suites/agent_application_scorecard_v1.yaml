@@ -1,0 +1,128 @@
+schema: codeflow.codeflowbench.campaign.v1
+suite: agent-application-scorecard-v1
+
+provider:
+  name: deepseek
+  model: deepseek-v4-flash
+  allow_fallback: false
+
+execution:
+  timeout_seconds: 180
+  retry_policy: symmetric
+  provider_call_max_attempts: 4
+  max_comparison_block_attempts: 2
+  max_retrieval_query_block_attempts: 1
+
+budget:
+  warning_cny: 50
+  hard_cap_cny: 100
+  max_provider_calls_per_trial: 10
+  max_input_tokens_per_call: 42000
+  max_output_tokens_per_call: 1500
+  max_additional_provider_attempts: 96
+  input_cache_miss_usd_per_million: 0.14
+  output_usd_per_million: 0.28
+  conservative_usd_to_cny_multiplier: 7.5
+  external_service_reserve_cny: 0
+  pricing_source: https://api-docs.deepseek.com/quick_start/pricing/
+  provider_trial_budgets:
+    context-calibration:
+      max_provider_calls_per_trial: 10
+      max_input_tokens_per_call: 42000
+      max_output_tokens_per_call: 1200
+    context:
+      max_provider_calls_per_trial: 10
+      max_input_tokens_per_call: 42000
+      max_output_tokens_per_call: 1200
+    tool-mcp-calibration:
+      max_provider_calls_per_trial: 6
+      max_input_tokens_per_call: 40000
+      max_output_tokens_per_call: 1500
+    tool-mcp:
+      max_provider_calls_per_trial: 6
+      max_input_tokens_per_call: 40000
+      max_output_tokens_per_call: 1500
+
+calibration:
+  suite: agent-application-scorecard-v1-calibration
+  repetitions: 2
+  pack_ids:
+    - context-calibration
+    - tool-mcp-calibration
+  expected_trials: 32
+  expected_retrieval_cases: 0
+  max_comparison_block_retries_total: 1
+  expected_trials_by_pack:
+    context-calibration: 16
+    tool-mcp-calibration: 16
+  expected_comparison_blocks_by_pack:
+    context-calibration: 8
+    tool-mcp-calibration: 8
+  expected_retrieval_cases_by_pack:
+    context-calibration: 0
+    tool-mcp-calibration: 0
+
+formal:
+  suite: agent-application-scorecard-v1-formal
+  repetitions: 3
+  pack_ids:
+    - context
+    - tool-mcp
+  expected_trials: 96
+  expected_retrieval_cases: 0
+  max_comparison_block_retries_total: 4
+  expected_trials_by_pack:
+    context: 48
+    tool-mcp: 48
+  expected_comparison_blocks_by_pack:
+    context: 24
+    tool-mcp: 24
+  expected_retrieval_cases_by_pack:
+    context: 0
+    tool-mcp: 0
+
+claim_rules:
+  - rule_id: context-token-reduction
+    metric: context.trial_total_input_token_reduction_percent
+    operator: ge
+    threshold: 15
+    prerequisites:
+      - context.efficiency_measurement_valid
+      - context.coverage_valid
+      - context.usage_complete
+      - context.single_axis_valid
+      - context.pass_count_noninferior
+      - context.minimum_success_matched_coverage
+      - context.no_two_of_three_pass_regressions
+  - rule_id: context-task-level-improvement-coverage
+    metric: context.tasks_with_lower_trial_total_input
+    operator: ge
+    threshold: 6
+    prerequisites:
+      - context.efficiency_measurement_valid
+      - context.coverage_valid
+      - context.usage_complete
+      - context.single_axis_valid
+      - context.minimum_success_matched_coverage
+  - rule_id: tool-schema-reduction
+    metric: tool_mcp.equal_task_macro_schema_token_reduction_percent
+    operator: ge
+    threshold: 50
+    prerequisites:
+      - tool_mcp.measurement_valid
+      - tool_mcp.all_initial_visible_sets_differ
+      - tool_mcp.all_mcp_arms_connected
+      - tool_mcp.minimum_success_matched_coverage
+      - tool_mcp.pass_count_noninferior
+      - tool_mcp.no_two_of_three_pass_regressions
+      - tool_mcp.invalid_target_call_rate_noninferior
+      - tool_mcp.exact_target_repeat_rate_noninferior
+  - rule_id: tool-task-level-improvement-coverage
+    metric: tool_mcp.tasks_with_lower_schema_tokens
+    operator: ge
+    threshold: 6
+    prerequisites:
+      - tool_mcp.measurement_valid
+      - tool_mcp.all_initial_visible_sets_differ
+      - tool_mcp.all_mcp_arms_connected
+      - tool_mcp.minimum_success_matched_coverage

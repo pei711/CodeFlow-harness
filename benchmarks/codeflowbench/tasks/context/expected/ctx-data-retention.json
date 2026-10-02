@@ -1,0 +1,6 @@
+{
+  "dataset": "events-v4",
+  "retention_days": 30,
+  "timezone": "UTC",
+  "owner": "data-governance"
+}

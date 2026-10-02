@@ -1,0 +1,6 @@
+{
+  "customer_id": "ACME-482",
+  "region": "ap-southeast-1",
+  "strategy": "blue-green",
+  "owner": "migrations"
+}

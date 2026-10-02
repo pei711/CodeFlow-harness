@@ -1,0 +1,133 @@
+{
+  "schema": "codeflow.codeflowbench.semantic-memory-effect-tasks.v1",
+  "tasks": [
+    {
+      "task_id": "semantic-memory-effect-00",
+      "workspace_id": "semantic-workspace-00",
+      "prior_session_id": "prior-session-00",
+      "customer": "Cedar Logistics",
+      "service": "shipment ledger",
+      "memory_text": "Cedar Logistics decided in the prior migration session that the shipment ledger belongs in eu-north-1, needs 61 days of retention, and is authorized by approval code CDR-K8P3.",
+      "distractor_memories": [
+        "Cedar Logistics publishes public tracking pages through an unrelated content network.",
+        "Delta Ceramics runs a warehouse dashboard in ap-south-1 and archives weekly summaries."
+      ],
+      "expected_region": "eu-north-1",
+      "expected_retention": "61 days",
+      "expected_approval_code": "CDR-K8P3",
+      "evaluation_request": "Resume Cedar Logistics' shipment ledger migration from the prior session. Recover the deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for values not found in Memory; do not guess."
+    },
+    {
+      "task_id": "semantic-memory-effect-01",
+      "workspace_id": "semantic-workspace-01",
+      "prior_session_id": "prior-session-01",
+      "customer": "Elm Research",
+      "service": "experiment registry",
+      "memory_text": "The earlier architecture review for Elm Research placed the experiment registry in us-west-1, set retention to 94 days, and captured approval code ELM-T4N7.",
+      "distractor_memories": [
+        "Elm Research keeps public paper metadata in a separate system without regulated retention.",
+        "Fjord Retail selected eu-central-2 for an unrelated inventory preview."
+      ],
+      "expected_region": "us-west-1",
+      "expected_retention": "94 days",
+      "expected_approval_code": "ELM-T4N7",
+      "evaluation_request": "Continue Elm Research's experiment registry work from the earlier review. Recover the agreed deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for values not found in Memory; do not guess."
+    },
+    {
+      "task_id": "semantic-memory-effect-02",
+      "workspace_id": "semantic-workspace-02",
+      "prior_session_id": "prior-session-02",
+      "customer": "Fable Energy",
+      "service": "meter exception store",
+      "memory_text": "Fable Energy's previous operations session specified ap-northeast-3 for the meter exception store, 38 days of retention, and approval code FBL-Q6W2.",
+      "distractor_memories": [
+        "Fable Energy streams aggregate status metrics to a public dashboard with no customer records.",
+        "Granite Foods hosts its supplier portal in eu-west-2 under a different account."
+      ],
+      "expected_region": "ap-northeast-3",
+      "expected_retention": "38 days",
+      "expected_approval_code": "FBL-Q6W2",
+      "evaluation_request": "Resume the Fable Energy meter exception store setup discussed previously. Recover its deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for values not found in Memory; do not guess."
+    },
+    {
+      "task_id": "semantic-memory-effect-03",
+      "workspace_id": "semantic-workspace-03",
+      "prior_session_id": "prior-session-03",
+      "customer": "Harbor Legal",
+      "service": "case evidence index",
+      "memory_text": "In the prior compliance meeting, Harbor Legal approved sa-east-1 for the case evidence index, required 112 days of retention, and issued approval code HBR-J9C5.",
+      "distractor_memories": [
+        "Harbor Legal maintains its marketing site independently from the case evidence platform.",
+        "Indigo Labs tests a temporary build cache in us-east-1 that is deleted nightly."
+      ],
+      "expected_region": "sa-east-1",
+      "expected_retention": "112 days",
+      "expected_approval_code": "HBR-J9C5",
+      "evaluation_request": "Continue Harbor Legal's case evidence index deployment from the prior compliance meeting. Recover the deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for values not found in Memory; do not guess."
+    },
+    {
+      "task_id": "semantic-memory-effect-04",
+      "workspace_id": "semantic-workspace-04",
+      "prior_session_id": "prior-session-04",
+      "customer": "Juniper Finance",
+      "service": "reconciliation vault",
+      "memory_text": "Juniper Finance agreed during the earlier reconciliation review to deploy the reconciliation vault in me-central-1, retain artifacts for 76 days, and use approval code JNP-A3L8.",
+      "distractor_memories": [
+        "Juniper Finance's public exchange-rate feed is managed separately and cached for minutes.",
+        "Kite Manufacturing runs a device catalog in ca-west-1 without financial records."
+      ],
+      "expected_region": "me-central-1",
+      "expected_retention": "76 days",
+      "expected_approval_code": "JNP-A3L8",
+      "evaluation_request": "Resume Juniper Finance's reconciliation vault setup from the earlier review. Recover the deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for values not found in Memory; do not guess."
+    },
+    {
+      "task_id": "semantic-memory-effect-05",
+      "workspace_id": "semantic-workspace-05",
+      "prior_session_id": "prior-session-05",
+      "customer": "Lumen Transit",
+      "service": "incident timeline",
+      "memory_text": "The previous reliability session for Lumen Transit assigned the incident timeline to af-south-1, set retention at 53 days, and recorded approval code LMN-D5S1.",
+      "distractor_memories": [
+        "Lumen Transit publishes route maps from a globally replicated static site.",
+        "Mosaic Health evaluates a scheduling prototype in ap-east-1 with synthetic data."
+      ],
+      "expected_region": "af-south-1",
+      "expected_retention": "53 days",
+      "expected_approval_code": "LMN-D5S1",
+      "evaluation_request": "Continue Lumen Transit's incident timeline configuration from the previous reliability session. Recover the deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for values not found in Memory; do not guess."
+    },
+    {
+      "task_id": "semantic-memory-effect-06",
+      "workspace_id": "semantic-workspace-06",
+      "prior_session_id": "prior-session-06",
+      "customer": "Nimbus Education",
+      "service": "assessment archive",
+      "memory_text": "Nimbus Education's earlier data review chose eu-south-2 for the assessment archive, required 129 days of retention, and approved code NMB-V7F4.",
+      "distractor_memories": [
+        "Nimbus Education serves course thumbnails from a separate object cache.",
+        "Orchard Telecom keeps anonymous uptime measurements in us-west-2."
+      ],
+      "expected_region": "eu-south-2",
+      "expected_retention": "129 days",
+      "expected_approval_code": "NMB-V7F4",
+      "evaluation_request": "Resume Nimbus Education's assessment archive deployment from the earlier data review. Recover the deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for values not found in Memory; do not guess."
+    },
+    {
+      "task_id": "semantic-memory-effect-07",
+      "workspace_id": "semantic-workspace-07",
+      "prior_session_id": "prior-session-07",
+      "customer": "Pine Robotics",
+      "service": "maintenance history",
+      "memory_text": "Pine Robotics confirmed in the preceding service session that maintenance history must be stored in il-central-1, retained for 87 days, and released under approval code PNE-X2B6.",
+      "distractor_memories": [
+        "Pine Robotics delivers firmware documentation through a public repository.",
+        "Quartz Hotels operates an unrelated reservation preview in ap-southeast-1."
+      ],
+      "expected_region": "il-central-1",
+      "expected_retention": "87 days",
+      "expected_approval_code": "PNE-X2B6",
+      "evaluation_request": "Continue Pine Robotics' maintenance history setup from the preceding service session. Recover the deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for values not found in Memory; do not guess."
+    }
+  ]
+}

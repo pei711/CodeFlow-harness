@@ -1,0 +1,69 @@
+{
+  "schema": "codeflow.codeflowbench.memory-skill-tasks.v1",
+  "tasks": [
+    {
+      "task_id": "memory-skill-task-00",
+      "workspace_id": "workspace-0",
+      "learned_fact": "customer-00-region=region-00",
+      "expected_value": "region-00",
+      "required_skill": "local-skill-00",
+      "evaluation_request": "Use recalled Memory to recover customer-00 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id memory-skill-task-00, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "memory-skill-task-01",
+      "workspace_id": "workspace-1",
+      "learned_fact": "customer-01-region=region-01",
+      "expected_value": "region-01",
+      "required_skill": "local-skill-01",
+      "evaluation_request": "Use recalled Memory to recover customer-01 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id memory-skill-task-01, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "memory-skill-task-02",
+      "workspace_id": "workspace-2",
+      "learned_fact": "customer-02-region=region-02",
+      "expected_value": "region-02",
+      "required_skill": "local-skill-02",
+      "evaluation_request": "Use recalled Memory to recover customer-02 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id memory-skill-task-02, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "memory-skill-task-03",
+      "workspace_id": "workspace-3",
+      "learned_fact": "customer-03-region=region-03",
+      "expected_value": "region-03",
+      "required_skill": "local-skill-03",
+      "evaluation_request": "Use recalled Memory to recover customer-03 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id memory-skill-task-03, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "memory-skill-task-04",
+      "workspace_id": "workspace-4",
+      "learned_fact": "customer-04-region=region-04",
+      "expected_value": "region-04",
+      "required_skill": "everos-skill-04",
+      "evaluation_request": "Use recalled Memory to recover customer-04 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id memory-skill-task-04, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "memory-skill-task-05",
+      "workspace_id": "workspace-5",
+      "learned_fact": "customer-05-region=region-05",
+      "expected_value": "region-05",
+      "required_skill": "everos-skill-05",
+      "evaluation_request": "Use recalled Memory to recover customer-05 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id memory-skill-task-05, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "memory-skill-task-06",
+      "workspace_id": "workspace-6",
+      "learned_fact": "customer-06-region=region-06",
+      "expected_value": "region-06",
+      "required_skill": "everos-skill-06",
+      "evaluation_request": "Use recalled Memory to recover customer-06 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id memory-skill-task-06, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "memory-skill-task-07",
+      "workspace_id": "workspace-7",
+      "learned_fact": "customer-07-region=region-07",
+      "expected_value": "region-07",
+      "required_skill": "everos-skill-07",
+      "evaluation_request": "Use recalled Memory to recover customer-07 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id memory-skill-task-07, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    }
+  ]
+}

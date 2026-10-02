@@ -1,0 +1,37 @@
+{
+  "schema": "codeflow.codeflowbench.memory-skill-tasks.v1",
+  "tasks": [
+    {
+      "task_id": "cal-memory-skill-task-00",
+      "workspace_id": "cal-workspace-0",
+      "learned_fact": "cal-customer-00-region=cal-region-00",
+      "expected_value": "cal-region-00",
+      "required_skill": "cal-local-skill-00",
+      "evaluation_request": "Use recalled Memory to recover cal-customer-00 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id cal-memory-skill-task-00, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "cal-memory-skill-task-01",
+      "workspace_id": "cal-workspace-1",
+      "learned_fact": "cal-customer-01-region=cal-region-01",
+      "expected_value": "cal-region-01",
+      "required_skill": "cal-local-skill-01",
+      "evaluation_request": "Use recalled Memory to recover cal-customer-01 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id cal-memory-skill-task-01, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "cal-memory-skill-task-02",
+      "workspace_id": "cal-workspace-2",
+      "learned_fact": "cal-customer-02-region=cal-region-02",
+      "expected_value": "cal-region-02",
+      "required_skill": "cal-everos-skill-02",
+      "evaluation_request": "Use recalled Memory to recover cal-customer-02 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id cal-memory-skill-task-02, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    },
+    {
+      "task_id": "cal-memory-skill-task-03",
+      "workspace_id": "cal-workspace-3",
+      "learned_fact": "cal-customer-03-region=cal-region-03",
+      "expected_value": "cal-region-03",
+      "required_skill": "cal-everos-skill-03",
+      "evaluation_request": "Use recalled Memory to recover cal-customer-03 region and the injected deployment Skill. Call write_file to create result.json containing exactly task_id cal-memory-skill-task-03, region set to the recalled value, and skill_applied set to true. Do not guess a missing value."
+    }
+  ]
+}

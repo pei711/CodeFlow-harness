@@ -1,0 +1,13 @@
+# Node 产物。
+node_modules/
+dist/
+.tsbuildinfo
+*.tsbuildinfo
+
+# 测试产物。
+coverage/
+.vitest-cache/
+
+# 编辑器文件。
+.vscode/
+.idea/

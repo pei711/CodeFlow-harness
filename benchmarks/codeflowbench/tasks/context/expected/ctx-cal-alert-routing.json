@@ -1,0 +1,6 @@
+{
+  "alert_id": "ALT-11",
+  "priority": "P1",
+  "channel": "ops-critical",
+  "owner": "sre"
+}

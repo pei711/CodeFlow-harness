@@ -1,0 +1,6 @@
+{
+  "queue": "orders",
+  "retry_limit": 3,
+  "dead_letter_queue": "orders-dlq",
+  "owner": "messaging"
+}

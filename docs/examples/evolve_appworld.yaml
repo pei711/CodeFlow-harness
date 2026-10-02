@@ -1,0 +1,60 @@
+# 示例：AppWorld Evolver Beta 运行规范（内置评分器路径）。
+#
+# Evolver 需要主动启用。候选晋升会记录证据和提交 SHA，但绝不会自动激活候选；
+# 激活必须经过人工评审。
+#
+#   uv run codeflow evolve check --config <this file>            # 验证配置
+#   uv run codeflow evolve run   --config <this file> --smoke   # 小型连线运行
+#   uv run codeflow evolve run   --config <this file>           # 真实运行
+#   uv run codeflow evolve status --config <this file>          # 查看进度（密封安全）
+#
+# 一个命令完成全部流程：缺失时建立冷启动基线、执行演化轮次、终止、解封并留存。
+# 可随时中断，同一命令会恢复执行。`finalize` 提前结束运行并解封，此操作单向。
+#
+# 前置条件：包含 data/ 的 AppWorld 安装、目标运行时配置 JSON 和任务标识列表。请替换下方所有
+# /path/to/...。
+
+bench: appworld
+repo_root: /path/to/codeflow-harness         # 被演化的目标仓库
+# base_sha: <commit-sha>                 # 根节点；省略时使用 repo_root 当前 HEAD，
+                                         # 启动时解析一次并在整个运行期间固定
+work_dir: /path/to/evolution/work         # 可写且位于 repo_root 外
+
+# 完全省略 `models` 时，所有角色使用 CodeFlow 自身配置的模型。这些是演化循环的
+# 大脑，与目标智能体模型不同；后者在整个运行期间固定于 bench_config.config_path。
+models:
+  driver:  {provider: claude_cli, model: claude-haiku-4-5, max_concurrency: 4}
+  design:  {provider: claude_cli, model: claude-opus-4-8}
+  verdict: {provider: claude_cli, model: claude-opus-4-8}
+  # 或：{provider: openai_compat, base_url: https://host/v1, model: <name>,
+  #      api_key_env: EVOLVER_DRIVER_API_KEY}
+
+funnel:                       # 全部可选；示例值用于紧凑运行
+                              # 省略时默认 k_screen 1、k_confirm 3、budget 2x3、
+                              # patience 10、max_rounds 20
+  k_screen: 1
+  k_confirm: 3
+  budget:      {max_why_per_round: 2, candidates_per_why: 2}
+  termination: {patience: 5, max_rounds: 8}
+
+bench_config:
+  # 复制 docs/examples/subject_runtime.json 并填写端点。
+  config_path: /path/to/subject_runtime.json
+  appworld_data_root: /path/to/appworld    # 持久化目录，包含 data/
+  train_task_file: /path/to/train.txt
+  test_task_file: /path/to/test.txt        # 必需的密封测试与留存任务
+  n: 90
+  conc: 8
+  base_port: 8600
+  extra_args: ["--task-timeout", "400"]
+  # 省略 whitelist 时使用仓库默认值 codeflow/agent/、benchmarks/appworld/；启动时会
+  # 根据 base_sha 验证每个前缀。无效前缀会拒绝启动，而不是静默丢弃设计者改动。
+
+# 传入 --smoke 时在内置缩减后深度合并到配置：1 个 WHY、1 个候选、1 轮、K=1；
+# work_dir 添加 _smoke 后缀。
+smoke:
+  bench_config:
+    train_task_ids: ["<failing-task-1>", "<failing-task-2>", "<failing-task-3>"]
+    n: 3
+    conc: 3
+    base_port: 8700

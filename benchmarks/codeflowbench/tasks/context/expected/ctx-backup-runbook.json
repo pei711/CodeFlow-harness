@@ -1,0 +1,6 @@
+{
+  "database": "ledger",
+  "rpo_minutes": 15,
+  "checksum": "sha256",
+  "owner": "storage"
+}

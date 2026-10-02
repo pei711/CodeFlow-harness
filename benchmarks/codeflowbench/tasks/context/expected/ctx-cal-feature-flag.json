@@ -1,0 +1,6 @@
+{
+  "feature": "checkout-redesign",
+  "rollout_percent": 35,
+  "key": "tenant_id",
+  "owner": "growth"
+}

@@ -1,0 +1,7 @@
+schema_version = 2
+
+[policy]
+v_d0_exceptions_allowed = false
+new_ids_require_review = true
+dependency_ids_are_normalized = true
+release_blocks_critical_or_high = true

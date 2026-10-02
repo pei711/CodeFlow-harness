@@ -1,0 +1,60 @@
+schema: codeflow.codeflowbench.semantic-addendum.v2
+suite: agent-application-ship-1-semantic-v2
+artifact_root: .codeflow/evidence/codeflowbench-semantic-v2
+evidence:
+  memory_stage: context_injection
+  skill_stage: candidate_retrieval
+  final_skill_gate_evaluated: false
+development_evidence:
+  suite: agent-application-ship-1-semantic
+  experiment_id: 1336036d67d0c4ddf6142d894ed1cbfc1019d85d4624bd878d6a8c4e3b88018a
+  report_digest: 7d5bff56fca4d1cb5cc64984cb8ce0aa5f1c6f6d1b5ea4500f838d933067d0e1
+  disposition: retained_negative_development_result
+budget:
+  hard_cap_cny: 5.0
+  external_reserve_cny: 0.5
+  input_usd_per_million_tokens: 0.12
+  usd_to_cny_multiplier: 8.0
+  safety_multiplier: 2.0
+  characters_per_token: 2.0
+  workload_character_multiplier: 4.0
+  workload_call_multiplier: 2.0
+  max_characters_per_embedding_call: 4096
+  pricing_source: preregistered_conservative_embedding_ceiling
+embedding_transport:
+  dimension: 1024
+  timeout_seconds: 30
+  max_retries: 0
+  batch_size: 10
+  max_concurrent: 1
+retrieval:
+  memory_top_k: 1
+  skill_candidate_top_k: 10
+  user_method: hybrid
+  user_min_score: 0.65
+  agent_method: vector
+  agent_radius: 0.55
+  local_min_score: 4.0
+  local_weight: 1.0
+  everos_weight: 0.9
+tracks:
+  calibration:
+    expected_memory_cases: 12
+    expected_skill_cases: 36
+    expected_total_cases: 48
+  formal:
+    expected_memory_cases: 80
+    expected_skill_cases: 180
+    expected_total_cases: 260
+claims:
+  memory_recall_at_1_min: 0.80
+  memory_irrelevant_injection_rate_max: 0.05
+  memory_hard_negative_injection_rate_max: 0.05
+  skill_candidate_fused_recall_at_10_min: 0.80
+  skill_candidate_fused_recall_improvement_over_best_single_source_min: 0.05
+  skill_candidate_cross_workspace_leakage_count_max: 0
+  skill_raw_local_hard_negative_abstention_rate_min: 0.95
+  skill_raw_everos_hard_negative_abstention_rate_min: 0.95
+  skill_raw_fused_hard_negative_abstention_rate_min: 0.95
+  stale_injection_count_max: 0
+  cross_workspace_leakage_count_max: 0

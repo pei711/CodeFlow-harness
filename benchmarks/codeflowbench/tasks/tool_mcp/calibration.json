@@ -1,0 +1,97 @@
+{
+  "schema": "codeflow.codeflowbench.tool-mcp-tasks.v1",
+  "tasks": [
+    {
+      "task_id": "tool-calibration-01",
+      "title": "Inspect a calibration record",
+      "prompt": "Use catalog slot 05 to inspect resource calibration-alpha with numeric value 905.",
+      "targets": [
+        {
+          "tool": "catalog_probe_05",
+          "arguments": {
+            "resource": "calibration-alpha",
+            "operation": "inspect",
+            "value": 905
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-calibration-02",
+      "title": "Transform two calibration records",
+      "prompt": "Use catalog slot 13 to transform resource calibration-beta with numeric value 913, then use catalog slot 14 to transform resource calibration-gamma with numeric value 914.",
+      "targets": [
+        {
+          "tool": "catalog_probe_13",
+          "arguments": {
+            "resource": "calibration-beta",
+            "operation": "transform",
+            "value": 913
+          }
+        },
+        {
+          "tool": "catalog_probe_14",
+          "arguments": {
+            "resource": "calibration-gamma",
+            "operation": "transform",
+            "value": 914
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-calibration-03",
+      "title": "Validate three calibration records",
+      "prompt": "Use catalog slot 34 to validate resource calibration-delta with numeric value 934, catalog slot 35 to validate resource calibration-epsilon with numeric value 935, and catalog slot 36 to validate resource calibration-zeta with numeric value 936.",
+      "targets": [
+        {
+          "tool": "catalog_probe_34",
+          "arguments": {
+            "resource": "calibration-delta",
+            "operation": "validate",
+            "value": 934
+          }
+        },
+        {
+          "tool": "catalog_probe_35",
+          "arguments": {
+            "resource": "calibration-epsilon",
+            "operation": "validate",
+            "value": 935
+          }
+        },
+        {
+          "tool": "catalog_probe_36",
+          "arguments": {
+            "resource": "calibration-zeta",
+            "operation": "validate",
+            "value": 936
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-calibration-04",
+      "title": "Inspect two final calibration records",
+      "prompt": "Use catalog slot 61 to inspect resource calibration-eta with numeric value 961, then use catalog slot 62 to inspect resource calibration-theta with numeric value 962.",
+      "targets": [
+        {
+          "tool": "catalog_probe_61",
+          "arguments": {
+            "resource": "calibration-eta",
+            "operation": "inspect",
+            "value": 961
+          }
+        },
+        {
+          "tool": "catalog_probe_62",
+          "arguments": {
+            "resource": "calibration-theta",
+            "operation": "inspect",
+            "value": 962
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "codeflow.codeflowbench.retrieval-fixture.v1",
+  "evidence_level": "deterministic_contract",
+  "paid_provider_calls": 0,
+  "embedding_calls": 0,
+  "everos_semantic_quality_claim_eligible": false,
+  "formal": {
+    "memory_corpus_items": 160,
+    "memory_positive_queries": 50,
+    "memory_hard_negative_queries": 30,
+    "skill_positive_queries": 40,
+    "skill_hard_negative_queries": 20,
+    "skill_configurations": [
+      "local_only",
+      "everos_only",
+      "fused"
+    ]
+  },
+  "calibration": {
+    "memory_positive_queries": 6,
+    "memory_hard_negative_queries": 4,
+    "skill_positive_queries": 5,
+    "skill_hard_negative_queries": 3,
+    "skill_configurations": [
+      "local_only",
+      "everos_only",
+      "fused"
+    ]
+  }
+}

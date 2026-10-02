@@ -1,0 +1,37 @@
+{
+  "schema": "codeflow.codeflowbench.semantic-memory-effect-tasks.v1",
+  "tasks": [
+    {
+      "task_id": "cal-semantic-memory-effect-00",
+      "workspace_id": "cal-semantic-workspace-00",
+      "prior_session_id": "cal-prior-session-00",
+      "customer": "Aster Workshop",
+      "service": "invoice archive",
+      "memory_text": "During the earlier support session, Aster Workshop confirmed that its invoice archive must run in ap-southeast-2, retain records for 47 days, and use approval code CAL-R7Q4.",
+      "distractor_memories": [
+        "Northwind Bakery uses its catalog service in eu-west-3 and reviews retention every quarter.",
+        "Aster Workshop routes public website traffic through a separate edge account that is unrelated to invoice storage."
+      ],
+      "expected_region": "ap-southeast-2",
+      "expected_retention": "47 days",
+      "expected_approval_code": "CAL-R7Q4",
+      "evaluation_request": "Aster Workshop asked us to continue the invoice archive setup from the earlier session. Recover its deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for any value that is not present in Memory; do not guess."
+    },
+    {
+      "task_id": "cal-semantic-memory-effect-01",
+      "workspace_id": "cal-semantic-workspace-01",
+      "prior_session_id": "cal-prior-session-01",
+      "customer": "Birch Medical",
+      "service": "audit export",
+      "memory_text": "In the previous planning conversation, Birch Medical selected ca-central-1 for the audit export, required 83 days of retention, and recorded approval code CAL-M2V9.",
+      "distractor_memories": [
+        "Birch Medical's staff directory is maintained by another team and has no shared deployment settings.",
+        "Copper Studio operates a media export in us-east-2 with a monthly cleanup review."
+      ],
+      "expected_region": "ca-central-1",
+      "expected_retention": "83 days",
+      "expected_approval_code": "CAL-M2V9",
+      "evaluation_request": "Continue Birch Medical's audit export configuration from the previous conversation. Recover the agreed deployment region, retention period, and approval code from prior-session Memory. Call write_file to create result.json containing exactly task_id, region, retention, and approval_code. Use null for any value that is not present in Memory; do not guess."
+    }
+  ]
+}

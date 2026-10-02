@@ -1,0 +1,125 @@
+{
+  "schema": "codeflow.codeflowbench.tokenwise-cost.tasks.v1",
+  "tasks": [
+    {
+      "task_id": "tw-stable-dialogue-1",
+      "workload_class": "stable_dialogue",
+      "case_index": 1,
+      "turn_count": 6,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 0,
+      "user_prompts": ["Reply only ALPHA1.", "Reply only ALPHA2.", "Reply only ALPHA3.", "Reply only ALPHA4.", "Reply only ALPHA5.", "Reply only ALPHA6."],
+      "expected_outputs": ["ALPHA1", "ALPHA2", "ALPHA3", "ALPHA4", "ALPHA5", "ALPHA6"]
+    },
+    {
+      "task_id": "tw-stable-dialogue-2",
+      "workload_class": "stable_dialogue",
+      "case_index": 2,
+      "turn_count": 6,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 0,
+      "user_prompts": ["Reply only BRAVO1.", "Reply only BRAVO2.", "Reply only BRAVO3.", "Reply only BRAVO4.", "Reply only BRAVO5.", "Reply only BRAVO6."],
+      "expected_outputs": ["BRAVO1", "BRAVO2", "BRAVO3", "BRAVO4", "BRAVO5", "BRAVO6"]
+    },
+    {
+      "task_id": "tw-stable-dialogue-3",
+      "workload_class": "stable_dialogue",
+      "case_index": 3,
+      "turn_count": 6,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 0,
+      "user_prompts": ["Reply only CHARLIE1.", "Reply only CHARLIE2.", "Reply only CHARLIE3.", "Reply only CHARLIE4.", "Reply only CHARLIE5.", "Reply only CHARLIE6."],
+      "expected_outputs": ["CHARLIE1", "CHARLIE2", "CHARLIE3", "CHARLIE4", "CHARLIE5", "CHARLIE6"]
+    },
+    {
+      "task_id": "tw-long-history-1",
+      "workload_class": "long_history",
+      "case_index": 1,
+      "turn_count": 6,
+      "seed_history_turns": 16,
+      "expected_tool_calls_per_turn": 0,
+      "user_prompts": ["Reply only DELTA1.", "Reply only DELTA2.", "Reply only DELTA3.", "Reply only DELTA4.", "Reply only DELTA5.", "Reply only DELTA6."],
+      "expected_outputs": ["DELTA1", "DELTA2", "DELTA3", "DELTA4", "DELTA5", "DELTA6"]
+    },
+    {
+      "task_id": "tw-long-history-2",
+      "workload_class": "long_history",
+      "case_index": 2,
+      "turn_count": 6,
+      "seed_history_turns": 16,
+      "expected_tool_calls_per_turn": 0,
+      "user_prompts": ["Reply only ECHO1.", "Reply only ECHO2.", "Reply only ECHO3.", "Reply only ECHO4.", "Reply only ECHO5.", "Reply only ECHO6."],
+      "expected_outputs": ["ECHO1", "ECHO2", "ECHO3", "ECHO4", "ECHO5", "ECHO6"]
+    },
+    {
+      "task_id": "tw-long-history-3",
+      "workload_class": "long_history",
+      "case_index": 3,
+      "turn_count": 6,
+      "seed_history_turns": 16,
+      "expected_tool_calls_per_turn": 0,
+      "user_prompts": ["Reply only FOXTROT1.", "Reply only FOXTROT2.", "Reply only FOXTROT3.", "Reply only FOXTROT4.", "Reply only FOXTROT5.", "Reply only FOXTROT6."],
+      "expected_outputs": ["FOXTROT1", "FOXTROT2", "FOXTROT3", "FOXTROT4", "FOXTROT5", "FOXTROT6"]
+    },
+    {
+      "task_id": "tw-tool-accumulation-1",
+      "workload_class": "tool_accumulation",
+      "case_index": 1,
+      "turn_count": 6,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 1,
+      "user_prompts": ["Look up GOLF1, then reply only GOLF1.", "Look up GOLF2, then reply only GOLF2.", "Look up GOLF3, then reply only GOLF3.", "Look up GOLF4, then reply only GOLF4.", "Look up GOLF5, then reply only GOLF5.", "Look up GOLF6, then reply only GOLF6."],
+      "expected_outputs": ["GOLF1", "GOLF2", "GOLF3", "GOLF4", "GOLF5", "GOLF6"]
+    },
+    {
+      "task_id": "tw-tool-accumulation-2",
+      "workload_class": "tool_accumulation",
+      "case_index": 2,
+      "turn_count": 6,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 1,
+      "user_prompts": ["Look up HOTEL1, then reply only HOTEL1.", "Look up HOTEL2, then reply only HOTEL2.", "Look up HOTEL3, then reply only HOTEL3.", "Look up HOTEL4, then reply only HOTEL4.", "Look up HOTEL5, then reply only HOTEL5.", "Look up HOTEL6, then reply only HOTEL6."],
+      "expected_outputs": ["HOTEL1", "HOTEL2", "HOTEL3", "HOTEL4", "HOTEL5", "HOTEL6"]
+    },
+    {
+      "task_id": "tw-tool-accumulation-3",
+      "workload_class": "tool_accumulation",
+      "case_index": 3,
+      "turn_count": 6,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 1,
+      "user_prompts": ["Look up INDIA1, then reply only INDIA1.", "Look up INDIA2, then reply only INDIA2.", "Look up INDIA3, then reply only INDIA3.", "Look up INDIA4, then reply only INDIA4.", "Look up INDIA5, then reply only INDIA5.", "Look up INDIA6, then reply only INDIA6."],
+      "expected_outputs": ["INDIA1", "INDIA2", "INDIA3", "INDIA4", "INDIA5", "INDIA6"]
+    },
+    {
+      "task_id": "tw-intra-turn-tool-chain-1",
+      "workload_class": "intra_turn_tool_chain",
+      "case_index": 1,
+      "turn_count": 1,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 3,
+      "user_prompts": ["Run the three-step chain for JULIET, then reply only JULIET."],
+      "expected_outputs": ["JULIET"]
+    },
+    {
+      "task_id": "tw-intra-turn-tool-chain-2",
+      "workload_class": "intra_turn_tool_chain",
+      "case_index": 2,
+      "turn_count": 1,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 3,
+      "user_prompts": ["Run the three-step chain for KILO, then reply only KILO."],
+      "expected_outputs": ["KILO"]
+    },
+    {
+      "task_id": "tw-intra-turn-tool-chain-3",
+      "workload_class": "intra_turn_tool_chain",
+      "case_index": 3,
+      "turn_count": 1,
+      "seed_history_turns": 0,
+      "expected_tool_calls_per_turn": 3,
+      "user_prompts": ["Run the three-step chain for LIMA, then reply only LIMA."],
+      "expected_outputs": ["LIMA"]
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "schema": "codeflow.codeflowbench.tool-mcp-tasks.v1",
+  "tasks": [
+    {
+      "task_id": "tool-formal-01",
+      "title": "Inspect the primary account record",
+      "prompt": "Use catalog slot 03 to inspect resource account-alpha with numeric value 103.",
+      "targets": [
+        {
+          "tool": "catalog_probe_03",
+          "arguments": {
+            "resource": "account-alpha",
+            "operation": "inspect",
+            "value": 103
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-formal-02",
+      "title": "Transform two deployment records",
+      "prompt": "Use catalog slot 09 to transform resource deployment-east with numeric value 209, then use catalog slot 10 to transform resource deployment-west with numeric value 210.",
+      "targets": [
+        {
+          "tool": "catalog_probe_09",
+          "arguments": {
+            "resource": "deployment-east",
+            "operation": "transform",
+            "value": 209
+          }
+        },
+        {
+          "tool": "catalog_probe_10",
+          "arguments": {
+            "resource": "deployment-west",
+            "operation": "transform",
+            "value": 210
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-formal-03",
+      "title": "Validate three invoice records",
+      "prompt": "Use catalog slot 17 to validate resource invoice-red with numeric value 317, catalog slot 18 to validate resource invoice-green with numeric value 318, and catalog slot 19 to validate resource invoice-blue with numeric value 319.",
+      "targets": [
+        {
+          "tool": "catalog_probe_17",
+          "arguments": {
+            "resource": "invoice-red",
+            "operation": "validate",
+            "value": 317
+          }
+        },
+        {
+          "tool": "catalog_probe_18",
+          "arguments": {
+            "resource": "invoice-green",
+            "operation": "validate",
+            "value": 318
+          }
+        },
+        {
+          "tool": "catalog_probe_19",
+          "arguments": {
+            "resource": "invoice-blue",
+            "operation": "validate",
+            "value": 319
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-formal-04",
+      "title": "Inspect one incident record",
+      "prompt": "Use catalog slot 25 to inspect resource incident-kappa with numeric value 425.",
+      "targets": [
+        {
+          "tool": "catalog_probe_25",
+          "arguments": {
+            "resource": "incident-kappa",
+            "operation": "inspect",
+            "value": 425
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-formal-05",
+      "title": "Transform two customer records",
+      "prompt": "Use catalog slot 31 to transform resource customer-north with numeric value 531, then use catalog slot 32 to transform resource customer-south with numeric value 532.",
+      "targets": [
+        {
+          "tool": "catalog_probe_31",
+          "arguments": {
+            "resource": "customer-north",
+            "operation": "transform",
+            "value": 531
+          }
+        },
+        {
+          "tool": "catalog_probe_32",
+          "arguments": {
+            "resource": "customer-south",
+            "operation": "transform",
+            "value": 532
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-formal-06",
+      "title": "Validate three release records",
+      "prompt": "Use catalog slot 39 to validate resource release-canary with numeric value 639, catalog slot 40 to validate resource release-stable with numeric value 640, and catalog slot 41 to validate resource release-archive with numeric value 641.",
+      "targets": [
+        {
+          "tool": "catalog_probe_39",
+          "arguments": {
+            "resource": "release-canary",
+            "operation": "validate",
+            "value": 639
+          }
+        },
+        {
+          "tool": "catalog_probe_40",
+          "arguments": {
+            "resource": "release-stable",
+            "operation": "validate",
+            "value": 640
+          }
+        },
+        {
+          "tool": "catalog_probe_41",
+          "arguments": {
+            "resource": "release-archive",
+            "operation": "validate",
+            "value": 641
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-formal-07",
+      "title": "Inspect two repository records",
+      "prompt": "Use catalog slot 48 to inspect resource repository-core with numeric value 748, then use catalog slot 49 to inspect resource repository-tools with numeric value 749.",
+      "targets": [
+        {
+          "tool": "catalog_probe_48",
+          "arguments": {
+            "resource": "repository-core",
+            "operation": "inspect",
+            "value": 748
+          }
+        },
+        {
+          "tool": "catalog_probe_49",
+          "arguments": {
+            "resource": "repository-tools",
+            "operation": "inspect",
+            "value": 749
+          }
+        }
+      ]
+    },
+    {
+      "task_id": "tool-formal-08",
+      "title": "Transform three audit records",
+      "prompt": "Use catalog slot 57 to transform resource audit-input with numeric value 857, catalog slot 58 to transform resource audit-result with numeric value 858, and catalog slot 59 to transform resource audit-summary with numeric value 859.",
+      "targets": [
+        {
+          "tool": "catalog_probe_57",
+          "arguments": {
+            "resource": "audit-input",
+            "operation": "transform",
+            "value": 857
+          }
+        },
+        {
+          "tool": "catalog_probe_58",
+          "arguments": {
+            "resource": "audit-result",
+            "operation": "transform",
+            "value": 858
+          }
+        },
+        {
+          "tool": "catalog_probe_59",
+          "arguments": {
+            "resource": "audit-summary",
+            "operation": "transform",
+            "value": 859
+          }
+        }
+      ]
+    }
+  ]
+}

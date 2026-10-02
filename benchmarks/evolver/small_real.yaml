@@ -1,0 +1,42 @@
+# 小型真实演化运行：针对 scripts/setup_small_real_subject.py 生成的一次性目标仓库
+# 执行一轮漏斗。
+#
+#   uv run python scripts/setup_small_real_subject.py            # 仅执行一次
+#   uv run codeflow evolve check    --config benchmarks/evolver/small_real.yaml
+#   uv run codeflow evolve run      --config benchmarks/evolver/small_real.yaml --smoke
+#   uv run codeflow evolve run      --config benchmarks/evolver/small_real.yaml
+#   uv run codeflow evolve status   --config benchmarks/evolver/small_real.yaml
+#   uv run codeflow evolve finalize --config benchmarks/evolver/small_real.yaml --yes
+#
+# bench 键使用 `appworld`，因为它是已注册模块路径
+# benchmarks.appworld.evolve.entry:build，注册表会从下方目标仓库导入它。
+# 一次性目标自带 entry.py，不会接触真实 AppWorld 环境。
+
+bench: appworld
+repo_root: subject                # 相对此文件；被 Git 忽略并由脚本创建
+                                  # scripts/setup_small_real_subject.py
+# 省略 base_sha：目标恰有一个提交，启动时解析并在整个运行期间固定。
+work_dir: ../../.codeflow/evolver/small-real   # 位于目标仓库外、被 Git 忽略的
+                                           # .codeflow/ 证据根目录下
+
+# 完全省略 models：所有循环角色使用 CodeFlow 自身配置的模型，即
+# ~/.codeflow/config.json 中的 agents.defaults.model。
+
+funnel:                           # 规模适配一轮真实运行
+  k_screen: 1
+  k_confirm: 2
+  budget:      {max_why_per_round: 1, candidates_per_why: 1}
+  termination: {patience: 1, max_rounds: 1}
+
+bench_config:
+  timeout: 120                    # 评分子进程超时秒数
+  # 省略 train_task_ids/test_task_ids，使用目标内置拆分：针对 agent_cli.py 的
+  # 10 个训练任务与 4 个密封测试断言任务。
+
+# 传入 --smoke 时在内置缩减后深度合并：1 个 WHY、1 个候选、1 轮、K=1，
+# work_dir 添加 _smoke 后缀。固定三个 slugify 任务（其中两个失败）和一个不重叠的
+# 密封标识。
+smoke:
+  bench_config:
+    train_task_ids: ["slug-basic", "slug-trim", "slug-collapse"]
+    test_task_ids: ["sealed-slug-plain"]

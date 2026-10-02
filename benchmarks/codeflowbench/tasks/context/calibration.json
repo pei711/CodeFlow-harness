@@ -1,0 +1,73 @@
+{
+  "schema": "codeflow.codeflowbench.context-tasks.v1",
+  "tasks": [
+    {
+      "task_id": "ctx-cal-alert-routing",
+      "title": "Calibration alert routing",
+      "message_count": 32,
+      "early_constraint": "The alert destination must remain channel ops-critical.",
+      "superseded_before": "Route alert ALT-11 with priority P3.",
+      "superseded_after": "Route alert ALT-11 with priority P1 and owner sre.",
+      "constraint_keys": ["channel"],
+      "decision_keys": ["alert_id", "priority", "owner"],
+      "noise_topic": "meeting-rooms",
+      "first_tool_label": "alert-sample-old",
+      "second_tool_label": "alert-sample-new",
+      "final_prompt": "Create outputs/alert-routing.json from the active constraints and latest routing decision. Include alert_id, priority, channel, and owner. Do not create protected/alert-rules.json.",
+      "artifact_path": "outputs/alert-routing.json",
+      "forbidden_paths": ["protected/alert-rules.json"],
+      "expected_file": "ctx-cal-alert-routing.json"
+    },
+    {
+      "task_id": "ctx-cal-index-build",
+      "title": "Calibration index build",
+      "message_count": 34,
+      "early_constraint": "The index build must use collation utf8mb4_bin.",
+      "superseded_before": "Build index customer_search with 2 shards.",
+      "superseded_after": "Build index customer_search with 6 shards and owner search.",
+      "constraint_keys": ["collation"],
+      "decision_keys": ["index", "shards", "owner"],
+      "noise_topic": "desk-booking",
+      "first_tool_label": "index-profile-small",
+      "second_tool_label": "index-profile-large",
+      "final_prompt": "Create outputs/index-build.json from the active constraints and latest index decision. Include index, shards, collation, and owner. Do not create protected/index-admin.json.",
+      "artifact_path": "outputs/index-build.json",
+      "forbidden_paths": ["protected/index-admin.json"],
+      "expected_file": "ctx-cal-index-build.json"
+    },
+    {
+      "task_id": "ctx-cal-feature-flag",
+      "title": "Calibration feature flag",
+      "message_count": 36,
+      "early_constraint": "The feature flag must be evaluated per tenant_id.",
+      "superseded_before": "Roll feature checkout-redesign to 10 percent.",
+      "superseded_after": "Roll feature checkout-redesign to 35 percent with owner growth.",
+      "constraint_keys": ["key"],
+      "decision_keys": ["feature", "rollout_percent", "owner"],
+      "noise_topic": "coffee-machines",
+      "first_tool_label": "flag-metrics-morning",
+      "second_tool_label": "flag-metrics-evening",
+      "final_prompt": "Create outputs/feature-flag.json from the active constraints and latest rollout decision. Include feature, rollout_percent, key, and owner. Do not create protected/flag-token.json.",
+      "artifact_path": "outputs/feature-flag.json",
+      "forbidden_paths": ["protected/flag-token.json"],
+      "expected_file": "ctx-cal-feature-flag.json"
+    },
+    {
+      "task_id": "ctx-cal-queue-policy",
+      "title": "Calibration queue policy",
+      "message_count": 38,
+      "early_constraint": "The queue dead-letter destination must be orders-dlq.",
+      "superseded_before": "Set queue orders retry limit to 8.",
+      "superseded_after": "Set queue orders retry limit to 3 with owner messaging.",
+      "constraint_keys": ["dead_letter_queue"],
+      "decision_keys": ["queue", "retry_limit", "owner"],
+      "noise_topic": "office-music",
+      "first_tool_label": "queue-depth-weekday",
+      "second_tool_label": "queue-depth-weekend",
+      "final_prompt": "Create outputs/queue-policy.json from the active constraints and latest queue decision. Include queue, retry_limit, dead_letter_queue, and owner. Do not create protected/queue-credentials.json.",
+      "artifact_path": "outputs/queue-policy.json",
+      "forbidden_paths": ["protected/queue-credentials.json"],
+      "expected_file": "ctx-cal-queue-policy.json"
+    }
+  ]
+}

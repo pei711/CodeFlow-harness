@@ -1,0 +1,272 @@
+schema: codeflow.codeflowbench.campaign.v1
+suite: agent-application-ship-1
+
+provider:
+  name: deepseek
+  model: deepseek-v4-flash
+  allow_fallback: false
+
+execution:
+  timeout_seconds: 180
+  retry_policy: symmetric
+  provider_call_max_attempts: 2
+  max_comparison_block_attempts: 2
+  max_retrieval_query_block_attempts: 2
+
+budget:
+  warning_cny: 80
+  hard_cap_cny: 100
+  max_provider_calls_per_trial: 8
+  max_input_tokens_per_call: 42000
+  max_output_tokens_per_call: 1500
+  max_additional_provider_attempts: 64
+  input_cache_miss_usd_per_million: 0.14
+  output_usd_per_million: 0.28
+  conservative_usd_to_cny_multiplier: 7.5
+  external_service_reserve_cny: 5
+  pricing_source: https://api-docs.deepseek.com/quick_start/pricing/
+  provider_trial_budgets:
+    context-calibration:
+      max_provider_calls_per_trial: 8
+      max_input_tokens_per_call: 42000
+      max_output_tokens_per_call: 1200
+    context:
+      max_provider_calls_per_trial: 8
+      max_input_tokens_per_call: 42000
+      max_output_tokens_per_call: 1200
+    memory-skill-calibration-v1:
+      max_provider_calls_per_trial: 4
+      max_input_tokens_per_call: 15000
+      max_output_tokens_per_call: 1500
+    memory-skill-v1:
+      max_provider_calls_per_trial: 4
+      max_input_tokens_per_call: 15000
+      max_output_tokens_per_call: 1500
+    semantic-memory-effect-calibration-v1:
+      max_provider_calls_per_trial: 8
+      max_input_tokens_per_call: 15000
+      max_output_tokens_per_call: 1500
+    semantic-memory-effect-v1:
+      max_provider_calls_per_trial: 8
+      max_input_tokens_per_call: 15000
+      max_output_tokens_per_call: 1500
+    tool-mcp-calibration:
+      max_provider_calls_per_trial: 4
+      max_input_tokens_per_call: 40000
+      max_output_tokens_per_call: 1500
+    tool-mcp:
+      max_provider_calls_per_trial: 4
+      max_input_tokens_per_call: 40000
+      max_output_tokens_per_call: 1500
+
+calibration:
+  suite: agent-application-ship-1-calibration
+  repetitions: 2
+  pack_ids:
+    - context-calibration
+    - memory-skill-calibration-v1
+    - semantic-memory-effect-calibration-v1
+    - tool-mcp-calibration
+  expected_trials: 64
+  expected_retrieval_cases: 34
+  max_comparison_block_retries_total: 1
+  expected_trials_by_pack:
+    context-calibration: 16
+    memory-skill-calibration-v1: 24
+    semantic-memory-effect-calibration-v1: 8
+    tool-mcp-calibration: 16
+  expected_comparison_blocks_by_pack:
+    context-calibration: 8
+    memory-skill-calibration-v1: 8
+    semantic-memory-effect-calibration-v1: 4
+    tool-mcp-calibration: 8
+  expected_retrieval_cases_by_pack:
+    context-calibration: 0
+    memory-skill-calibration-v1: 34
+    semantic-memory-effect-calibration-v1: 0
+    tool-mcp-calibration: 0
+
+formal:
+  suite: agent-application-ship-1-formal
+  repetitions: 3
+  pack_ids:
+    - context
+    - memory-skill-v1
+    - semantic-memory-effect-v1
+    - tool-mcp
+  expected_trials: 216
+  expected_retrieval_cases: 260
+  max_comparison_block_retries_total: 4
+  expected_trials_by_pack:
+    context: 48
+    memory-skill-v1: 72
+    semantic-memory-effect-v1: 48
+    tool-mcp: 48
+  expected_comparison_blocks_by_pack:
+    context: 24
+    memory-skill-v1: 24
+    semantic-memory-effect-v1: 24
+    tool-mcp: 24
+  expected_retrieval_cases_by_pack:
+    context: 0
+    memory-skill-v1: 260
+    semantic-memory-effect-v1: 0
+    tool-mcp: 0
+
+claim_rules:
+  - rule_id: context-token-reduction
+    metric: context.trial_total_input_token_reduction_percent
+    operator: ge
+    threshold: 15
+    prerequisites:
+      - context.measurement_valid
+      - context.coverage_valid
+      - context.usage_complete
+      - context.single_axis_valid
+      - context.pass_count_noninferior
+      - context.minimum_success_matched_coverage
+      - context.no_two_of_three_pass_regressions
+  - rule_id: context-task-level-improvement-coverage
+    metric: context.tasks_with_lower_trial_total_input
+    operator: ge
+    threshold: 6
+    prerequisites:
+      - context.measurement_valid
+      - context.coverage_valid
+      - context.usage_complete
+      - context.single_axis_valid
+      - context.minimum_success_matched_coverage
+  - rule_id: memory-task-effect
+    metric: semantic_memory_e2e.net_verifier_gains
+    operator: ge
+    threshold: 6
+    prerequisites:
+      - semantic_memory_e2e.measurement_valid
+      - semantic_memory_e2e.coverage_valid
+      - semantic_memory_e2e.attempt_consistency_valid
+      - semantic_memory_e2e.variant_axis_valid
+      - semantic_memory_e2e.no_two_of_three_regressions
+      - semantic_memory_e2e.memory_off_backend_calls_zero
+      - semantic_memory_e2e.treatment_target_hits_complete
+      - semantic_memory_e2e.real_agent_task_effect_evidence_valid
+  - rule_id: memory-task-effect-coverage
+    metric: semantic_memory_e2e.positive_tasks
+    operator: ge
+    threshold: 4
+    prerequisites:
+      - semantic_memory_e2e.measurement_valid
+      - semantic_memory_e2e.coverage_valid
+      - semantic_memory_e2e.attempt_consistency_valid
+      - semantic_memory_e2e.variant_axis_valid
+      - semantic_memory_e2e.no_two_of_three_regressions
+      - semantic_memory_e2e.memory_off_backend_calls_zero
+      - semantic_memory_e2e.treatment_target_hits_complete
+      - semantic_memory_e2e.real_agent_task_effect_evidence_valid
+  - rule_id: skill-task-effect
+    metric: skill_e2e.net_verifier_gains
+    operator: ge
+    threshold: 2
+    prerequisites:
+      - memory_skill.measurement_valid
+      - skill_e2e.coverage_valid
+      - skill_e2e.attempt_consistency_valid
+      - skill_e2e.variant_axis_valid
+      - skill_e2e.no_two_of_three_regressions
+      - skill_e2e.real_agent_task_effect_evidence_valid
+  - rule_id: skill-task-effect-coverage
+    metric: skill_e2e.positive_tasks
+    operator: ge
+    threshold: 2
+    prerequisites:
+      - memory_skill.measurement_valid
+      - skill_e2e.coverage_valid
+      - skill_e2e.attempt_consistency_valid
+      - skill_e2e.variant_axis_valid
+      - skill_e2e.no_two_of_three_regressions
+      - skill_e2e.real_agent_task_effect_evidence_valid
+  - rule_id: memory-recall-at-five
+    metric: memory_retrieval.final_injection_recall_at_5
+    operator: ge
+    threshold: 0.8
+    prerequisites:
+      - memory_skill.measurement_valid
+      - memory_retrieval.coverage_valid
+      - memory_retrieval.real_semantic_evidence_valid
+  - rule_id: memory-irrelevant-injection
+    metric: memory_retrieval.irrelevant_injection_rate
+    operator: le
+    threshold: 0.05
+    prerequisites:
+      - memory_skill.measurement_valid
+      - memory_retrieval.coverage_valid
+      - memory_retrieval.real_semantic_evidence_valid
+  - rule_id: memory-hard-negative-injection
+    metric: memory_retrieval.hard_negative_injection_rate
+    operator: le
+    threshold: 0.05
+    prerequisites:
+      - memory_skill.measurement_valid
+      - memory_retrieval.coverage_valid
+      - memory_retrieval.real_semantic_evidence_valid
+  - rule_id: memory-stale-injection
+    metric: memory_retrieval.stale_injection_count
+    operator: eq
+    threshold: 0
+    prerequisites:
+      - memory_skill.measurement_valid
+      - memory_retrieval.coverage_valid
+      - memory_retrieval.real_semantic_evidence_valid
+  - rule_id: memory-cross-workspace-leakage
+    metric: memory_retrieval.cross_workspace_leakage_count
+    operator: eq
+    threshold: 0
+    prerequisites:
+      - memory_skill.measurement_valid
+      - memory_retrieval.coverage_valid
+      - memory_retrieval.real_semantic_evidence_valid
+  - rule_id: skill-fusion-improvement
+    metric: skill_fusion.improvement_over_best_single_source
+    operator: ge
+    threshold: 0.05
+    prerequisites:
+      - memory_skill.measurement_valid
+      - skill_fusion.coverage_valid
+      - skill_fusion.real_semantic_evidence_valid
+  - rule_id: skill-hard-negative-injection
+    metric: skill_fusion.hard_negative_injection_rate
+    operator: le
+    threshold: 0.05
+    prerequisites:
+      - memory_skill.measurement_valid
+      - skill_fusion.coverage_valid
+      - skill_fusion.real_semantic_evidence_valid
+  - rule_id: skill-cross-workspace-leakage
+    metric: skill_fusion.cross_workspace_leakage_count
+    operator: eq
+    threshold: 0
+    prerequisites:
+      - memory_skill.measurement_valid
+      - skill_fusion.coverage_valid
+      - skill_fusion.real_semantic_evidence_valid
+  - rule_id: tool-schema-reduction
+    metric: tool_mcp.equal_task_macro_schema_token_reduction_percent
+    operator: ge
+    threshold: 50
+    prerequisites:
+      - tool_mcp.measurement_valid
+      - tool_mcp.all_initial_visible_sets_differ
+      - tool_mcp.all_mcp_arms_connected
+      - tool_mcp.minimum_success_matched_coverage
+      - tool_mcp.pass_count_noninferior
+      - tool_mcp.no_two_of_three_pass_regressions
+      - tool_mcp.invalid_target_call_rate_noninferior
+      - tool_mcp.exact_target_repeat_rate_noninferior
+  - rule_id: tool-task-level-improvement-coverage
+    metric: tool_mcp.tasks_with_lower_schema_tokens
+    operator: ge
+    threshold: 6
+    prerequisites:
+      - tool_mcp.measurement_valid
+      - tool_mcp.all_initial_visible_sets_differ
+      - tool_mcp.all_mcp_arms_connected
+      - tool_mcp.minimum_success_matched_coverage

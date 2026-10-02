@@ -1,0 +1,6 @@
+{
+  "index": "customer_search",
+  "shards": 6,
+  "collation": "utf8mb4_bin",
+  "owner": "search"
+}
