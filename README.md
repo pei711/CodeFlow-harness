@@ -22,11 +22,12 @@ Session, Context, tools, and evidence model stay the same.
 
 ---
 
-CodeFlow is a compact Agent Harness. Every host submits a Turn through the same
-Runtime instead of building its own agent loop. CodeFlow owns scheduling,
-cancellation, Context assembly, tool execution, Session persistence, Tracing,
-and delivery. Optional Memory backends plug into that Runtime, but this release
-does not bundle an external Memory implementation.
+CodeFlow is an open-source Agent Runtime and Harness. CLI, native TUI, Gateway,
+scheduled jobs, and messaging channels submit work through the same Runtime.
+The native TUI includes a session-history sidebar for returning to earlier
+conversations, while the Runtime handles scheduling, Context, tool execution,
+Session persistence, tracing, and delivery. Optional Memory backends can plug
+into the Runtime; this release does not bundle an external Memory implementation.
 
 ```mermaid
 flowchart LR

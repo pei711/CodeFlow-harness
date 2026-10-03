@@ -26,7 +26,7 @@ function scrollBoundsForDelta(s: ScrollBoxHandle, cur: number, delta: number) {
   // getScrollHeight() 在渲染时缓存。流式尾部写入虚拟历史后，Yoga 高度可能比
   // 缓存更新；若只按缓存中的虚假底部做限制，向下滚轮会变成空操作，也不会安排
   // 新渲染来显示真实尾部。
-  if (delta > 0 && cur + delta >= max - 1) {
+  if (cur > max || (delta > 0 && cur + delta >= max - 1)) {
     const freshHeight = Math.max(viewport, s.getFreshScrollHeight())
     max = Math.max(0, freshHeight - viewport)
   }
@@ -41,7 +41,24 @@ export function scrollWithSelectionBy(delta: number, { scrollRef, selection }: S
     return
   }
 
-  const cur = s.getScrollTop() + s.getPendingDelta()
+  let cur = s.getScrollTop() + s.getPendingDelta()
+
+  // stickyScroll can still be active for one frame after the transcript grows:
+  // the renderer has not yet committed its new bottom position, so the cached
+  // scrollTop may still be zero. A wheel-up at that point would be mistaken for
+  // an attempt to scroll past the top and silently discarded. Resolve the
+  // sticky position from fresh Yoga measurements before applying the user move.
+  if (delta < 0 && cur <= 0 && s.isSticky()) {
+    const viewport = Math.max(0, s.getViewportHeight())
+    const freshHeight = Math.max(viewport, s.getFreshScrollHeight())
+    const freshMax = Math.max(0, freshHeight - viewport)
+
+    if (freshMax > 0) {
+      s.scrollTo(freshMax)
+      cur = freshMax
+    }
+  }
+
   const { max, viewport } = scrollBoundsForDelta(s, cur, delta)
   const actual = Math.max(0, Math.min(max, cur + delta)) - cur
 

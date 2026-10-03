@@ -446,19 +446,24 @@ export function useSessionLifecycle(opts: UseSessionLifecycleOptions) {
 
   const resumeById = useCallback(
     (id: string) => {
-      if (sessionMutationActiveRef.current) {
-        sys('wait for the current session mutation before switching sessions')
-
-        return
-      }
-
-      if (pendingPasteRef?.current) {
-        sys('wait for the clipboard image attachment before switching sessions')
-
-        return
-      }
-
       const currentSid = getUiState().sid
+
+      if (id === currentSid) {
+        return
+      }
+
+      const blocked = sessionSwitchBlockMessage(
+        getUiState().busy,
+        Boolean(pendingPasteRef?.current),
+        'switch sessions',
+        getUiState().sessionSwitching,
+        sessionMutationActiveRef.current
+      )
+
+      if (blocked) {
+        sys(blocked)
+        return
+      }
 
       patchOverlayState({ picker: false })
       patchUiState({ status: 'resuming…' })

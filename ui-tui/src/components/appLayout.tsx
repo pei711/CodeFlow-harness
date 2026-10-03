@@ -9,6 +9,7 @@ import { Fragment, memo, useMemo, useRef } from 'react'
 
 import type { AppLayoutProps } from '../app/interfaces.js'
 
+import { useGateway } from '../app/gatewayContext.js'
 import { $isBlocked, $overlayState, patchOverlayState } from '../app/overlayStore.js'
 import { $uiState } from '../app/uiStore.js'
 import { INLINE_MODE, SHOW_FPS } from '../config/env.js'
@@ -30,6 +31,7 @@ import { FpsOverlay } from './fpsOverlay.js'
 import { HelpHint } from './helpHint.js'
 import { MessageLine } from './messageLine.js'
 import { QueuedMessages } from './queuedMessages.js'
+import { SessionSidebar } from './sessionSidebar.js'
 import { LiveTodoPanel, StreamingAssistant } from './streamingAssistant.js'
 import { TextInput, type TextInputMouseApi } from './textInput.js'
 
@@ -440,6 +442,14 @@ export const AppLayout = memo(function AppLayout({
 }: AppLayoutProps) {
   const overlay = useStore($overlayState)
   const ui = useStore($uiState)
+  const { gw } = useGateway()
+  const showSessionSidebar = !overlay.agents && composer.cols >= 88
+  const sidebarWidth = showSessionSidebar ? 26 : 0
+  const mainCols = Math.max(1, composer.cols - sidebarWidth)
+  const mainComposer = useMemo(
+    () => (mainCols === composer.cols ? composer : { ...composer, cols: mainCols }),
+    [composer, mainCols]
+  )
 
   // 行内模式跳过 AlternateScreen，使宿主终端原生回滚区能保留滚出顶部的行；
   // 编辑框和进度条通过普通纵向弹性布局保持锚定。
@@ -448,42 +458,54 @@ export const AppLayout = memo(function AppLayout({
 
   return (
     <Shell {...shellProps}>
-      <Box backgroundColor={ui.theme.color.surface} flexDirection="column" flexGrow={1}>
-        {!overlay.agents && <SessionHeader cwdLabel={status.cwdLabel} />}
+      <Box backgroundColor={ui.theme.color.surface} flexDirection="row" flexGrow={1}>
+        {showSessionSidebar && (
+          <SessionSidebar
+            activeSid={ui.sid}
+            gw={gw}
+            onSelect={actions.resumeById}
+            t={ui.theme}
+            width={sidebarWidth}
+          />
+        )}
 
-        <Box flexDirection="row" flexGrow={1}>
-          {overlay.agents ? (
-            <PerfPane id="agents">
-              <AgentsOverlayPane />
-            </PerfPane>
-          ) : (
-            <PerfPane id="transcript">
-              <TranscriptPane actions={actions} composer={composer} progress={progress} transcript={transcript} />
-            </PerfPane>
+        <Box flexDirection="column" flexGrow={1} flexShrink={1}>
+          {!overlay.agents && <SessionHeader cwdLabel={status.cwdLabel} />}
+
+          <Box flexDirection="row" flexGrow={1}>
+            {overlay.agents ? (
+              <PerfPane id="agents">
+                <AgentsOverlayPane />
+              </PerfPane>
+            ) : (
+              <PerfPane id="transcript">
+                <TranscriptPane actions={actions} composer={mainComposer} progress={progress} transcript={transcript} />
+              </PerfPane>
+            )}
+          </Box>
+
+          {!overlay.agents && (
+            <>
+              <PerfPane id="prompt">
+                <PromptZone
+                  cols={mainComposer.cols}
+                  onClarifyAnswer={actions.answerClarify}
+                  onConfirmAnswer={actions.answerConfirm}
+                />
+              </PerfPane>
+
+              <PerfPane id="composer">
+                <ComposerPane actions={actions} composer={mainComposer} status={status} />
+              </PerfPane>
+
+              {SHOW_FPS && (
+                <Box flexShrink={0} justifyContent="flex-end" paddingRight={1}>
+                  <FpsOverlay t={ui.theme} />
+                </Box>
+              )}
+            </>
           )}
         </Box>
-
-        {!overlay.agents && (
-          <>
-            <PerfPane id="prompt">
-              <PromptZone
-                cols={composer.cols}
-                onClarifyAnswer={actions.answerClarify}
-                onConfirmAnswer={actions.answerConfirm}
-              />
-            </PerfPane>
-
-            <PerfPane id="composer">
-              <ComposerPane actions={actions} composer={composer} status={status} />
-            </PerfPane>
-
-            {SHOW_FPS && (
-              <Box flexShrink={0} justifyContent="flex-end" paddingRight={1}>
-                <FpsOverlay t={ui.theme} />
-              </Box>
-            )}
-          </>
-        )}
       </Box>
     </Shell>
   )

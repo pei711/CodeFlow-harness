@@ -23,9 +23,9 @@
 
 ## 项目介绍
 
-CodeFlow 是面向开发者的开源 Agent Runtime 与 Harness，帮助把模型调用、工具执行、
-上下文管理、会话持久化、任务调度和结果投递放进一条统一的运行链路。你可以在终端或
-原生 TUI 中与 Agent 协作，也可以通过 Gateway、定时任务和消息渠道运行它。
+CodeFlow 是面向开发者的开源 Agent Runtime 与 Harness，让 CLI、原生 TUI、Gateway、
+定时任务和消息渠道共用同一套运行时。原生 TUI 带有会话历史侧栏，可以切换并继续之前的
+对话；Runtime 负责任务调度、上下文组装、工具执行、会话持久化、链路追踪和结果投递。
 
 不同入口共用同一套 Turn 契约和 Runtime，因此不需要为每种接入方式重复维护 Agent Loop。
 CodeFlow 负责任务调度与取消、Context 预算和组装、工具调用、Session 持久化、Tracing，
