@@ -35,6 +35,12 @@ CodeFlow 也提供 CodeFlowBench，用来评估 Agent Runtime、Context、工具
 外部 Memory Backend 可以按需接入；未配置时，系统会明确保持关闭状态。项目运行环境为
 Python 3.12，原生 TUI 使用 Node.js 22。
 
+上下文管理采用 CodeFlow 的分层方案：每次模型调用前按前缀、Memory、Skills、相关记忆和历史分配预算，
+当前用户请求保持完整；随着历史压力升高，先压缩旧工具结果、再优先裁剪旧轮次，达到高压阈值时将较早历史
+总结并记录边界，同时继续携带最近对话。已完成轮次会生成本地摘要，新问题通过语义检索与 BM25 两路召回，
+再用 RRF 融合排名，最多注入三条。语义模型可通过 `semantic-memory` extra 安装；未安装或模型不可用时，
+使用 TF-IDF 字符向量与 BM25 降级。摘要保存在项目 Runtime 状态目录的 `context_memory/` 中。
+
 ```mermaid
 flowchart LR
     U["你"] --> H["CLI · TUI · Gateway · Cron · 飞书"]

@@ -62,6 +62,9 @@ retrieval = [
     "torch>=2.0.0",
     "transformers>=4.45.0",
 ]
+semantic-memory = [
+    "fastembed>=0.7.3,<1",
+]
 sandbox = [
     "boxlite==0.9.5",
     "anyio>=4.0",

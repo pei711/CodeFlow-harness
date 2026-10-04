@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 # ---------------------------------------------------------------------------
 #
 # Turn 上下文的每一部分都由 :class:`SegmentBuilder` 产生。
-# seg1–5（identity / bootstrap / memory / active-skills / skills）和 Curator
+# identity / bootstrap / memory / active-skills / skills 与 History manager
 # 都是 SegmentBuilder，不再另设“lane”类别。
 # :class:`ContextAssembler` 分两个阶段运行它们，并路由其
 # 将输出写入 system / history 槽位。
@@ -44,14 +44,14 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class AssembledPrefix:
-    """保存 Phase A 已确定的固定 Prompt 前缀，供 Phase B 的 Curator 精确预算。
+    """保存 Phase A 已确定的固定 Prompt 前缀，供 Phase B 的 History manager 使用。
 
     Phase A 的独立 Builder 先产出 System Segment；Assembler 把它们连接成 ``system_prefix``，
     再连同当前 ``user_message`` 与 ``tool_defs`` 放进本对象。Phase B Builder 因而能先计算
     fixed prompt overhead，再把剩余 Token 精确分配给 ``*history``，不会用预估的 System 大小
     重复裁剪。
 
-    对象冻结且只在两阶段之间传递，不代表完整 `AssembledContext`；History 尚未由 Curator
+    对象冻结且只在两阶段之间传递，不代表完整 `AssembledContext`；History 尚未由 History manager
     选择，最终消息也尚未按 system/history/user 槽位合并。
     """
 
@@ -88,7 +88,7 @@ class Segment:
     """统一承载一个 :class:`SegmentBuilder` 对本轮 Context 的贡献。
 
     ``text`` 写入 System slot，Assembler 按 Builder 的 ``order`` 连接；空字符串 ``""`` 表示
-    本轮没有该 Segment。``history`` 写入 History slot，目前只有 Curator 设置，其他 Builder
+    本轮没有该 Segment。``history`` 写入 History slot，目前只有 History manager 设置，其他 Builder
     保持 ``None``，从而避免多个所有者同时裁剪历史。``meta`` 会合并进
     ``AssembledContext.metadata``，例如 ``injected_skill_ids``、``memory_hits`` 与 ``path``，
     供 Turn evidence 使用而不暴露给模型正文。
@@ -104,14 +104,14 @@ class Segment:
 
 @runtime_checkable
 class SegmentBuilder(Protocol):
-    """定义一个独立 Context 贡献者，seg1–5 与 Curator 都实现该协议。
+    """定义一个独立 Context 贡献者，普通片段与 History manager 都实现该协议。
 
     ``name`` 用于身份与诊断，``order`` 固定其在 System Prompt 中的位置，``needs_prefix`` 决定
     调度阶段：默认 ``False`` 的 Builder 进入 Phase A 并行批次；值为真表示它读取
     ``ctx.prefix``，必须等固定前缀形成后进入 Phase B。Builder 只返回自己的 `Segment` 或
     ``None``，不直接拼最终消息。
 
-    统一 Protocol 取代 identity/bootstrap/memory/skills 与 Curator 的两套“lane”类别，使新增
+    统一 Protocol 取代普通片段与 History manager 的两套“lane”类别，使新增
     贡献者只需声明依赖和顺序。实现仍必须尊重只读 AssemblyContext 和 TokenBudget，不能因
     并行执行共享可变 Turn 状态。
     """
@@ -135,8 +135,8 @@ class ContextEngine(ABC):
 
     当前唯一实现 :class:`ContextAssembler <codeflow.context_engine.assembler.ContextAssembler>`
     接收扁平 :class:`SegmentBuilder` 列表：Phase A 并行运行 seg1–5，即 identity、bootstrap、
-    memory+recall、active-skills、router-skills；Phase B 再运行 Curator，生成
-    ``# Curator Working State`` 与按预算裁剪的 ``*history``。最终结果才是 Provider 输入。
+    memory+recall、relevant-turn-memory、active-skills、router-skills；Phase B 再运行 CodeFlow
+    History manager，按压力分级处理历史并生成压缩摘要。最终结果才是 Provider 输入。
 
     该实现 ``owns_compaction=True``，所以 AgentLoop 提供完整 append-only Session 候选并把
     compaction 延后到 :meth:`after_turn`；其他实验 Engine 可以声明不同所有权，但必须通过
@@ -158,7 +158,7 @@ class ContextEngine(ABC):
         """声明 History compaction 是否由当前 Context Engine 独占。
 
          返回 ``True`` 时 AgentLoop 跳过 ``MemoryEngine.maybe_consolidate``，让 Engine 自己管理
-        历史；当前 Curator 会 out-of-band 归档消息。返回 ``False`` 时 Host 提供 consolidation 后
+        历史；当前 CodeFlow History manager 保存摘要和压缩边界。返回 ``False`` 时 Host 提供 consolidation 后
          切片。这个属性决定事实所有者，不能只作为性能开关，否则两个 Engine 可能重复压缩。
         """
 
@@ -189,7 +189,7 @@ class ContextEngine(ABC):
     ) -> None:
         """在 Turn 结束后给 Engine 一次可选的账本与归档更新机会。
 
-        当前 Curator 在这里更新 manifest / archives；Legacy 忽略它。``session_key`` 指定会话，
+        当前轮次记忆 Builder 在这里写入本地已完成轮次摘要。``session_key`` 指定会话，
         ``outcome`` 提供本轮结果证据，但默认实现是 no-op，允许未来 Engine 渐进 opt in，而不
         强迫不拥有 compaction 的实现伪造副作用。异常由调用方按事后流水线语义处理。
         """

@@ -26,8 +26,21 @@ CodeFlow is an open-source Agent Runtime and Harness. CLI, native TUI, Gateway,
 scheduled jobs, and messaging channels submit work through the same Runtime.
 The native TUI includes a session-history sidebar for returning to earlier
 conversations, while the Runtime handles scheduling, Context, tool execution,
-Session persistence, tracing, and delivery. Optional Memory backends can plug
-into the Runtime; this release does not bundle an external Memory implementation.
+Session persistence, tracing, and delivery. Built-in project-level turn memory
+works without an external backend; optional Memory backends can add long-term
+recall, and this release does not bundle an external Memory implementation.
+
+Context management follows CodeFlow's layered approach. Before each model call,
+it budgets the prefix, Memory, Skills, relevant memories, and history while
+preserving the current user request. As history pressure rises, it first snips
+older tool results, then prioritizes recent turns, and at high pressure
+summarizes older history behind a saved boundary. Completed turns also produce
+local summaries. New requests retrieve up to three relevant summaries through
+semantic search and BM25, then merge rankings with reciprocal rank fusion (RRF).
+Install the optional `semantic-memory` extra for FastEmbed; if the package or
+model is unavailable, retrieval falls back to TF-IDF character vectors plus
+BM25. Summaries live under the project's Runtime state directory in
+`context_memory/`.
 
 ```mermaid
 flowchart LR

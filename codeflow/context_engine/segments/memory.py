@@ -5,9 +5,9 @@
 `MemorySegmentBuilder` 排序和渲染，因此 System Prompt 只出现一个标题，也只有一个
 ``memory_hits`` 证据所有者。
 
-Backend 未接线或 Segment disabled 时不执行召回；启用后的 recall 硬失败会向上传播，不能
+Backend 未接线时不执行外部召回；启用后的 recall 硬失败会向上传播，不能
 静默假装“没有记忆”。Host 内容与命中均为空时返回空文本和零/实际命中 metadata，不影响
-Local Skill availability 或 Curator History 选择。
+Local Skill availability 或 CodeFlow History 管理。
 """
 
 from __future__ import annotations
@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING, Any
 
 from codeflow.context_engine.base import AssemblyContext, Segment
 from codeflow.context_engine.segments import render
+from codeflow.context_engine.turn_summaries import TurnSummaryStore
+from codeflow.security.trust import wrap_untrusted
 from codeflow.tracing import semconv, trace
 
 if TYPE_CHECKING:
@@ -50,7 +52,6 @@ class MemorySegmentBuilder:
         host = self._memory_store.get_memory_context(current_message=ctx.current_message)
         recall_hits = await self._recall(ctx.current_message)
         recall_bullets = render.render_recalled_memory(recall_hits)
-
         sections = [s for s in (host, recall_bullets) if s]
         meta: dict[str, Any] = {"memory_hits": len(recall_hits)}
         if not sections:
@@ -68,3 +69,38 @@ class MemorySegmentBuilder:
                 top_k=self._memory_top_k,
             )
         )
+
+
+class RelevantTurnMemorySegmentBuilder:
+    """Retrieve up to three completed-turn summaries using semantic + BM25 RRF."""
+
+    name = "relevant_memory"
+    order = 4.5
+    needs_prefix = False
+
+    def __init__(self, state_root) -> None:
+        self._store = TurnSummaryStore(state_root)
+        self._current_messages: dict[str, str] = {}
+
+    async def build(self, ctx: AssemblyContext) -> Segment:
+        self._current_messages[ctx.session_key] = ctx.current_message
+        hits, mode = self._store.retrieve(ctx.current_message, limit=3)
+        lines = ["# Relevant Turn Memory"]
+        if hits:
+            lines.append(wrap_untrusted("\n".join(f"- {item['text']}" for item in hits), source="recalled conversation"))
+        if not hits:
+            return Segment(text="", meta={"relevant_turn_memory_hits": 0, "relevant_turn_memory_mode": mode})
+        return Segment(
+            text="\n".join(lines),
+            meta={
+                "relevant_turn_memory_hits": len(hits),
+                "relevant_turn_memory_mode": mode,
+                "relevant_turn_memory": [item["summary_id"] for item in hits],
+            },
+        )
+
+    async def after_turn(self, session_key: str, outcome: dict[str, Any], usage=None) -> None:
+        request = self._current_messages.pop(session_key, "")
+        answer = str(outcome.get("final_content", "") or "").strip()
+        if request and answer:
+            self._store.add(session_key, str(outcome.get("turn_id", "") or ""), request, answer)

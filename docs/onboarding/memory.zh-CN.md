@@ -1,7 +1,10 @@
 # Memory 发布边界
 
-CodeFlow 保留 Memory Backend 协议和可选适配接口，但当前 GitHub 发布不包含外部
-Memory 实现、安装地址或配套制品。
+CodeFlow 内置项目级的已完成轮次摘要和两路混合召回。它将最近 200 轮保存为短摘要，按新问题执行语义检索
+与 BM25 关键词检索，再用 RRF 合并排名并最多注入三条。FastEmbed 是可选依赖；未安装或模型不可用时，
+语义一路降级为 TF-IDF 字符向量，关键词检索仍可工作。
+
+Memory Backend 协议仍允许外部长期记忆接入；当前 GitHub 发布不包含外部 Memory 实现、安装地址或配套制品。
 
 ## 当前受支持的配置
 
@@ -11,8 +14,8 @@ Memory 实现、安装地址或配套制品。
 codeflow onboard --skip-memory
 ```
 
-有效配置是 `memory.backend = null`。这只关闭外部长期记忆，不会关闭 Local Skills、
-Session、Context、Tool 或其他 CodeFlow Runtime 能力。
+有效配置是 `memory.backend = null`。这只关闭外部 Memory Backend，不会关闭内置轮次摘要召回、
+Host 用户资料、Local Skills、Session、Context、Tool 或其他 CodeFlow Runtime 能力。
 
 向导仍会通过完整 Runtime 执行第一条 Turn。Memory 关闭不应阻止 Provider、工具或
 Session 的正常工作。
