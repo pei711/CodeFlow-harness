@@ -13,6 +13,7 @@ Session, Context, tools, and evidence model stay the same.
 ![Status](https://img.shields.io/badge/Status-Alpha-F59E0B)
 
 [Quick start](#from-install-to-a-real-reply) ·
+[SRT shell sandbox](docs/onboarding/srt-sandbox.md) ·
 [First-use guide](docs/onboarding/README.zh-CN.md) ·
 [Feishu](docs/onboarding/feishu.zh-CN.md) ·
 [Agent install contract](docs/onboarding/agent-install.md) ·
@@ -29,6 +30,8 @@ conversations, while the Runtime handles scheduling, Context, tool execution,
 Session persistence, tracing, and delivery. Built-in project-level turn memory
 works without an external backend; optional Memory backends can add long-term
 recall, and this release does not bundle an external Memory implementation.
+Shell commands can run in Anthropic's SRT operating-system sandbox or BoxLite
+MicroVMs. SRT fails closed when its runtime or platform isolation is unavailable.
 
 Context management follows CodeFlow's layered approach. Before each model call,
 it budgets the prefix, Memory, Skills, relevant memories, and history while
@@ -124,6 +127,10 @@ codeflow doctor --probe
 
 `codeflow doctor --probe` sends a real model request. A static configuration check
 or a skipped probe does not prove that the Provider returned a reply.
+
+Shell commands can use BoxLite MicroVMs or Anthropic's SRT operating-system sandbox.
+See the [SRT shell sandbox guide](docs/onboarding/srt-sandbox.md) for setup,
+policy scope, and runtime limitations.
 
 See the [first-use guide](docs/onboarding/README.zh-CN.md) for private Release
 authentication, non-interactive setup, exact acceptance checks, and recovery

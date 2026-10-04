@@ -39,7 +39,8 @@ class SandboxConfig(BaseModel):
     """Sandbox Execution Configuration，当前隔离实现为 BoxLite MicroVM。
 
     `backend="none"` 明确选择 Host `DirectExecutor`，不提供隔离；`auto` 与 `boxlite` 都要求 BoxLite
-    可用，失败时启动报错而非静默降级。其余字段决定 VM 资源、Network、Mounts 与生命周期 Timeout。
+    可用，`srt` 则通过 Anthropic Sandbox Runtime 隔离单次 Shell 命令。后端不可用时均报错而非静默降级。
+    其余字段决定 VM 资源、Network、Mounts 与生命周期 Timeout。
 
     `allow_net=[]` 被拒绝，因为不同 Runtime 可能把空 Allowlist 解释为 Allow All 或 Allow None；禁网必须
     写 `False`。Extra Volume 两端必须是 Absolute Path，Mode 只能为 `ro`/`rw`，避免相对路径在 Host 与
@@ -49,10 +50,12 @@ class SandboxConfig(BaseModel):
     model_config = ConfigDict(extra="forbid", alias_generator=to_camel, populate_by_name=True)
 
     # "none"    → DirectExecutor：直接在宿主机运行，不提供隔离（默认）
-    # "auto"    → 自动检测：当前唯一支持的后端是 boxlite；
-    #             检测失败时在启动阶段报错
+    # "auto"    → 自动检测 BoxLite；检测失败时在启动阶段报错
     # "boxlite" → 强制使用 boxlite；同时执行可用性探测，不可用时报错
-    backend: Literal["none", "auto", "boxlite"] = "none"
+    # "srt"     → Anthropic Sandbox Runtime；只隔离 Shell 命令，不提供 MCP 子进程
+    backend: Literal["none", "auto", "boxlite", "srt"] = "none"
+    srt_cli_path: Path | None = None
+    srt_settings_path: Path | None = None
     image: str = "ubuntu:22.04"
     cpus: int = 2
     memory_mib: int = 2048

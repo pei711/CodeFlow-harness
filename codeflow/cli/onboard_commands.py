@@ -1404,7 +1404,9 @@ def _step3_sandbox(*, skip: bool, non_interactive: bool) -> object:
     choices: list[Any] = []
     if current != "none":
         choices.append(
-            questionary.Choice(_t("Keep current: sandbox (boxlite)", "沿用当前:沙箱(boxlite)"), value="keep")
+            questionary.Choice(
+                _t(f"Keep current: sandbox ({current})", f"沿用当前:沙箱({current})"), value="keep"
+            )
         )
     choices.extend(
         [
@@ -1421,6 +1423,13 @@ def _step3_sandbox(*, skip: bool, non_interactive: bool) -> object:
                     "沙箱隔离(boxlite)— 用轻量虚拟机隔离,更安全,需环境支持",
                 ),
                 value="boxlite",
+            ),
+            questionary.Choice(
+                _t(
+                    "SRT shell sandbox — OS-level isolation for commands (needs Node.js and platform setup)",
+                    "SRT Shell 沙箱 — 按操作系统隔离命令(需要 Node.js 和平台初始化)",
+                ),
+                value="srt",
             ),
             questionary.Choice(_t("Back", "返回"), value=_BACK),
         ]
@@ -1439,6 +1448,16 @@ def _step3_sandbox(*, skip: bool, non_interactive: bool) -> object:
             _t(
                 "  [green]✓ Running directly on the host.[/green]",
                 "  [green]✓ 将在本机直接运行。[/green]",
+            )
+        )
+        return None
+
+    if picked == "srt":
+        _persist_sandbox_backend("srt")
+        console.print(
+            _t(
+                "  [green]✓ SRT will sandbox Shell commands. Startup fails if the SRT CLI or OS sandbox is unavailable.[/green]",
+                "  [green]✓ Shell 命令将通过 SRT 沙箱执行。若 SRT CLI 或操作系统隔离不可用，Agent 会拒绝启动。[/green]",
             )
         )
         return None

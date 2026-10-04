@@ -51,7 +51,7 @@ class ExecResult:
 class SandboxExecutor(ABC):
     """Command Execution 的 Backend Abstraction。
 
-    Implementations 包括 BoxLite MicroVM 的 `BoxliteExecutor` 与 Host Fallback 的 `DirectExecutor`。
+    Implementations 包括 BoxLite MicroVM 的 `BoxliteExecutor`、SRT 命令隔离的 `SrtExecutor` 与 Host Fallback 的 `DirectExecutor`。
     `ExecTool` 只持有该 Interface，不知道 Concrete Backend。生命周期是构造、`start`、多次 `exec` 或
     `start_process`、最后 `stop`；Async Context Manager 自动遵循这一顺序。
 

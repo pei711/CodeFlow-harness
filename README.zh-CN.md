@@ -13,6 +13,7 @@
 
 [快速开始](#从安装到第一条真实回复) ·
 [首次使用指南](docs/onboarding/README.zh-CN.md) ·
+[SRT Shell 沙箱](docs/onboarding/srt-sandbox.zh-CN.md) ·
 [飞书接入](docs/onboarding/feishu.zh-CN.md) ·
 [Agent 安装契约](docs/onboarding/agent-install.md) ·
 [English](README.md)
@@ -30,6 +31,8 @@ CodeFlow 是面向开发者的开源 Agent Runtime 与 Harness，让 CLI、原�
 不同入口共用同一套 Turn 契约和 Runtime，因此不需要为每种接入方式重复维护 Agent Loop。
 CodeFlow 负责任务调度与取消、Context 预算和组装、工具调用、Session 持久化、Tracing，
 以及结果交付；工具能力覆盖本地文件、Shell、Web、MCP 和 Sandbox。
+Shell 可选择 Anthropic SRT 操作系统沙箱或 BoxLite MicroVM；SRT 初始化或运行不可用时会拒绝执行，
+不会静默退回宿主机 Shell。
 
 CodeFlow 也提供 CodeFlowBench，用来评估 Agent Runtime、Context、工具与记忆相关能力。
 外部 Memory Backend 可以按需接入；未配置时，系统会明确保持关闭状态。项目运行环境为
@@ -122,6 +125,9 @@ codeflow doctor --probe
 
 `codeflow doctor --probe` 会发送一次真实模型请求。静态配置检查通过，或者跳过 probe，
 都不能证明 Provider 已经返回回复。
+
+Shell 命令可选用 BoxLite MicroVM 或 Anthropic SRT 操作系统沙箱；首次启用、策略范围和运行限制见
+[SRT Shell 沙箱指南](docs/onboarding/srt-sandbox.zh-CN.md)。
 
 [首次使用指南](docs/onboarding/README.zh-CN.md)包含 Private Release 鉴权、
 非交互配置、精确验收命令和常见恢复路径。

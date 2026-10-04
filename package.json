@@ -6,6 +6,9 @@
   "scripts": {
     "commitlint": "commitlint --config commitlint.config.cjs"
   },
+  "dependencies": {
+    "@anthropic-ai/sandbox-runtime": "0.0.75"
+  },
   "devDependencies": {
     "@commitlint/cli": "^21.1.0"
   }

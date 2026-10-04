@@ -7,6 +7,7 @@ Public API 应全部从这里导入，不直接依赖 Sub-modules：
 - `SandboxExecutor`：Executor Implementations 的 ABC；
 - `SandboxConfig`：Pydantic Config Model；
 - `DirectExecutor`：在 Host Process 直接执行的 Fallback，**No Isolation**；
+- `SrtExecutor`：通过 Anthropic Sandbox Runtime 隔离单次 Shell 命令；
 - ``build_executor()``：把 `SandboxConfig` 构造成 `SandboxExecutor` 的 Factory。
 
 Sandbox 只隔离经 Executor 发出的命令。选择 `none` 会让 Prompt-injected Command 获得完整 Host
@@ -22,6 +23,7 @@ from loguru import logger
 from codeflow.sandbox.config import SandboxConfig
 from codeflow.sandbox.direct_executor import DirectExecutor
 from codeflow.sandbox.interfaces import ExecResult, SandboxExecutor, SandboxInitError
+from codeflow.sandbox.srt_executor import SrtExecutor
 
 # 每个进程只警告一次：进程生命周期内会创建多个执行器（AgentLoop 及各子 Agent），
 # 但“未使用沙箱”的风险提示只需输出一次。
@@ -33,6 +35,7 @@ __all__ = [
     "SandboxInitError",
     "SandboxConfig",
     "DirectExecutor",
+    "SrtExecutor",
     "build_executor",
 ]
 
@@ -51,7 +54,7 @@ def build_executor(
 
     `owned_ids` 是 Optional Shared Set，`BoxliteExecutor` 在 Start 时加入自己的 VM ID、Stop 时移除。
     `SandboxDebugServer` 用它区分本 Process 拥有的 VMs 与其他 Process 的 VMs。Factory 返回只表示对象
-    已创建，不证明 VM 已就绪或命令已经隔离。
+    已创建，不证明 VM 已就绪或命令已经隔离。`srt` 只提供单次 Shell 隔离，不能启动 MCP stdio 子进程。
     """
     backend = sandbox_cfg.backend if sandbox_cfg else "none"
 
@@ -92,4 +95,11 @@ def build_executor(
             owned_ids=owned_ids,
         )
 
-    raise SandboxInitError(f"Unknown sandbox backend: {backend!r}. Valid values: 'none', 'auto', 'boxlite'.")
+    if backend == "srt":
+        return SrtExecutor(
+            workspace=workspace,
+            cli_path=sandbox_cfg.srt_cli_path,
+            settings_path=sandbox_cfg.srt_settings_path,
+        )
+
+    raise SandboxInitError(f"Unknown sandbox backend: {backend!r}. Valid values: 'none', 'auto', 'boxlite', 'srt'.")

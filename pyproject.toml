@@ -109,6 +109,7 @@ include = [
     "codeflow/tracing/viewer/**/*.css",
     "codeflow/tracing/viewer/**/*.html",
     "codeflow/tracing/viewer/**/*.json",
+    "codeflow/sandbox/srt-settings.json",
 ]
 
 [tool.hatch.build.targets.sdist]
