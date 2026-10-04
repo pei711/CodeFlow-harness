@@ -1,12 +1,13 @@
 <div align="center">
 
-# CodeFlow
+# CodeFlow-harness
 
-### One Agent Runtime across every place you work.
+### An Agent Harness for concurrent tasks and multi-turn conversations.
 
-Run the same tool-using agent in your terminal, native TUI, background Gateway,
-scheduled jobs, and message channels. The entry point changes; the Turn,
-Session, Context, tools, and evidence model stay the same.
+Schedule concurrent tasks and multi-turn sessions with context governance,
+Checkpoint / Resume, an SRT shell sandbox, and regression evaluation. CLI, native
+TUI, Gateway, scheduled jobs, and messaging channels share one Runtime and one
+set of execution boundaries.
 
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-Apache--2.0-0B7285)
@@ -23,15 +24,22 @@ Session, Context, tools, and evidence model stay the same.
 
 ---
 
-CodeFlow is an open-source Agent Runtime and Harness. CLI, native TUI, Gateway,
-scheduled jobs, and messaging channels submit work through the same Runtime.
-The native TUI includes a session-history sidebar for returning to earlier
-conversations, while the Runtime handles scheduling, Context, tool execution,
-Session persistence, tracing, and delivery. Built-in project-level turn memory
-works without an external backend; optional Memory backends can add long-term
-recall, and this release does not bundle an external Memory implementation.
-Shell commands can run in Anthropic's SRT operating-system sandbox or BoxLite
-MicroVMs. SRT fails closed when its runtime or platform isolation is unavailable.
+CodeFlow-harness is an open-source Agent Harness for concurrent tasks and
+multi-turn conversations. It makes task execution replayable and evaluable, with
+explicit tool-execution boundaries. Session queues and concurrency limits
+preserve tool order within a conversation while allowing different sessions to
+run concurrently. Checkpoint / Resume supports interrupted-task recovery, and
+Context management budgets and compresses model input.
+
+CLI, native TUI, Gateway, scheduled jobs, and messaging channels share one
+Runtime. It handles scheduling and cancellation, Context assembly, tool
+execution, Session persistence, tracing, and delivery. Regression evaluation
+covers scheduling, model-call cost, Context and Memory, tool execution, and
+recovery. Built-in project-level turn memory works without an external backend;
+optional Memory backends can add long-term recall, and this release does not
+bundle an external Memory implementation. Shell commands can run in Anthropic's
+SRT operating-system sandbox or BoxLite MicroVMs. SRT fails closed when its
+runtime or platform isolation is unavailable.
 
 Context management follows CodeFlow's layered approach. Before each model call,
 it budgets the prefix, Memory, Skills, relevant memories, and history while
@@ -60,7 +68,7 @@ flowchart LR
 
 ## Evaluation highlights
 
-> Résumé-reported measurements from separate workloads and baselines; comparisons apply only within each stated test.
+> Selected project measurements from separate workloads and baselines; comparisons apply only within each stated test.
 
 ![CodeFlow reported benchmark results: task scheduling, call efficiency, memory and context, tool execution, and tracing](docs/assets/codeflow-benchmark-results-en.png)
 

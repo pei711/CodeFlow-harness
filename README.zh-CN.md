@@ -1,11 +1,11 @@
 <div align="center">
 
-# CodeFlow
+# CodeFlow-harness
 
-### 一套 Agent Runtime，跟你去每个工作入口。
+### 面向多任务并发与多轮对话的 Agent Harness。
 
-在终端、原生 TUI、后台 Gateway、定时任务和消息渠道中运行同一个会用工具的 Agent。
-入口可以变化，Turn、Session、Context、工具和证据模型保持一致。
+支持并发任务调度和多轮会话执行，并提供上下文治理、Checkpoint / Resume、SRT 工具沙箱与回归评测。
+CLI、原生 TUI、Gateway、定时任务和消息渠道共用同一套 Runtime、会话与执行边界。
 
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![License](https://img.shields.io/badge/License-Apache--2.0-0B7285)
@@ -24,13 +24,13 @@
 
 ## 项目介绍
 
-CodeFlow 是面向开发者的开源 Agent Runtime 与 Harness，让 CLI、原生 TUI、Gateway、
-定时任务和消息渠道共用同一套运行时。原生 TUI 带有会话历史侧栏，可以切换并继续之前的
-对话；Runtime 负责任务调度、上下文组装、工具执行、会话持久化、链路追踪和结果投递。
+CodeFlow-harness 是面向多任务并发与多轮对话的开源 Agent Harness，目标是让任务执行可复盘、可评测，
+并具有明确的工具执行边界。它通过会话队列和并发额度调度请求，支持同会话工具有序执行与跨会话并行；
+Checkpoint / Resume 用于中断恢复，Context 管理负责预算与压缩，SRT 为 Shell 命令提供操作系统级沙箱。
 
-不同入口共用同一套 Turn 契约和 Runtime，因此不需要为每种接入方式重复维护 Agent Loop。
-CodeFlow 负责任务调度与取消、Context 预算和组装、工具调用、Session 持久化、Tracing，
-以及结果交付；工具能力覆盖本地文件、Shell、Web、MCP 和 Sandbox。
+CLI、原生 TUI、后台 Gateway、定时任务和消息渠道共用同一套 Runtime。Runtime 负责调度与取消、
+上下文组装、工具调用、Session 持久化、链路追踪和结果交付；原生 TUI 支持查看并继续历史会话。
+评测体系覆盖任务调度、模型调用成本、上下文与记忆、工具执行和恢复能力。
 Shell 可选择 Anthropic SRT 操作系统沙箱或 BoxLite MicroVM；SRT 初始化或运行不可用时会拒绝执行，
 不会静默退回宿主机 Shell。
 
@@ -59,7 +59,7 @@ flowchart LR
 
 ## 测评结果概览
 
-> 数据摘自项目简历，来自不同负载与基线；各项只在自身测试范围内比较。
+> 摘录项目评测结果。数据来自不同负载与基线，各项只在各自测试范围内比较，不跨项对比。
 
 ![CodeFlow 项目测评图：任务调度、调用成本、记忆与上下文、工具调用和链路追踪](docs/assets/codeflow-benchmark-results-zh.png)
 

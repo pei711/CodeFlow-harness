@@ -1,7 +1,7 @@
 [project]
 name = "codeflow-harness"
 version = "0.1.7"
-description = "Compact, composable, benchmark-gated Agent Harness with an opt-in evolution path"
+description = "Concurrent, multi-turn Agent Harness with context governance, checkpoint recovery, SRT sandboxing, and evaluation"
 requires-python = ">=3.12,<3.13"
 license =  "Apache-2.0"
 license-files = ["LICENSE", "LICENSES/*", "NOTICES.md"]
