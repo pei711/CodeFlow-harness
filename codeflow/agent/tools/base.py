@@ -110,6 +110,14 @@ class Tool(ABC):
     def resolve_invocation(self, invocation: ToolInvocation) -> ToolInvocation:
         return invocation
 
+    def resource_key(self, invocation: ToolInvocation) -> str | None:
+        """Return the shared resource touched by this call, if it has one.
+
+        Tools without a resource key do not participate in the registry's
+        resource-level read/write locking.
+        """
+        return None
+
     def cast_params(self, params: dict[str, Any]) -> dict[str, Any]:
         """在正式校验前按 JSON Schema 做有限且安全的参数类型转换。
 

@@ -21,6 +21,7 @@ from loguru import logger
 from codeflow.agent.tools.base import ToolResult
 from codeflow.agent.tools.filesystem import EditFileTool, ListDirTool, ReadFileTool, WriteFileTool
 from codeflow.agent.tools.registry import ToolRegistry
+from codeflow.agent.tools.resource_locks import ResourceLockManager
 from codeflow.agent.tools.shell import ExecTool
 from codeflow.agent.tools.web import WebFetchTool, WebSearchTool
 from codeflow.config.schema import ExecToolConfig
@@ -82,6 +83,7 @@ class SubagentManager:
         max_concurrent: int = 4,
         max_spawns_per_hour: int = 30,
         state: Path | None = None,
+        resource_locks: ResourceLockManager | None = None,
     ):
         from codeflow.config.schema import ExecToolConfig
 
@@ -100,6 +102,7 @@ class SubagentManager:
         self.restrict_to_workspace = restrict_to_workspace
         self._sandbox_config = sandbox_config
         self._owned_ids = owned_ids
+        self._resource_locks = resource_locks or ResourceLockManager()
         self._running_tasks: dict[str, asyncio.Task[SubagentOutcome]] = {}
         self._session_tasks: dict[str, set[str]] = {}  # 会话键 -> {任务 ID, ...}
         self._gate = asyncio.Semaphore(max_concurrent)
@@ -209,7 +212,7 @@ class SubagentManager:
     ) -> SubagentOutcome:
         try:
             # 构建子 Agent 工具，不包含 message 和 spawn
-            tools = ToolRegistry()
+            tools = ToolRegistry(resource_locks=self._resource_locks)
             allowed_dir = self.workspace if self.restrict_to_workspace else None
             tools.register(ReadFileTool(workspace=self.workspace, allowed_dir=allowed_dir))
             tools.register(WriteFileTool(workspace=self.workspace, allowed_dir=allowed_dir))

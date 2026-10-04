@@ -6,11 +6,12 @@ READ effect，Write/Edit 声明 WRITE；返回值统一为模型可读文本，�
 """
 
 import difflib
+import os
 from pathlib import Path
 from typing import Any
 
 from codeflow.agent.tools.base import Tool
-from codeflow.agent.tools.execution import ToolCapability, ToolEffect
+from codeflow.agent.tools.execution import ToolCapability, ToolEffect, ToolInvocation
 
 
 def _resolve_path(path: str, workspace: Path | None = None, allowed_dir: Path | None = None) -> Path:
@@ -45,6 +46,12 @@ class _FsTool(Tool):
 
     def _resolve(self, path: str) -> Path:
         return _resolve_path(path, self._workspace, self._allowed_dir)
+
+    def resource_key(self, invocation: ToolInvocation) -> str | None:
+        path = invocation.arguments.get("path")
+        if not isinstance(path, str) or not path:
+            return None
+        return os.path.normcase(str(self._resolve(path)))
 
 
 # ---------------------------------------------------------------------------

@@ -41,6 +41,7 @@ from codeflow.agent.tools.file_search import FindTool, GrepTool
 from codeflow.agent.tools.filesystem import EditFileTool, ListDirTool, ReadFileTool, WriteFileTool
 from codeflow.agent.tools.message import MessageTool
 from codeflow.agent.tools.registry import ToolRegistry
+from codeflow.agent.tools.resource_locks import ResourceLockManager
 from codeflow.agent.tools.shell import ExecTool
 from codeflow.agent.tools.skill import SkillReadTool
 from codeflow.agent.tools.spawn import SpawnTool
@@ -340,7 +341,8 @@ class AgentLoop:
         # 供 BCP 等需要严格工具子集的评测框架使用。
         self._disabled_tools = set(disabled_tools or [])
         self._tool_search_config = tool_search_config
-        self.tools = ToolRegistry()
+        self._resource_locks = ResourceLockManager()
+        self.tools = ToolRegistry(resource_locks=self._resource_locks)
 
         # Context Engine 是唯一的 ContextAssembler。在 self.tools 之后于此构建，使工厂能将
         # ``self.tools.get_definitions`` 捕获为延迟可调用对象；真正的工具注册表内容
@@ -415,6 +417,7 @@ class AgentLoop:
             owned_ids=self._owned_ids,
             max_concurrent=max_concurrent_subagents,
             max_spawns_per_hour=max_subagent_spawns_per_hour,
+            resource_locks=self._resource_locks,
         )
 
         # 执行器此处只同步构建，虚拟机在 _start_executor() 中启动。
