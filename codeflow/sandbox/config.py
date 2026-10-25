@@ -6,7 +6,7 @@ Pydantic 禁止 Unknown Fields 并验证含糊或危险组合，使隔离错误�
 
 from __future__ import annotations
 
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -92,6 +92,6 @@ class SandboxConfig(BaseModel):
                 raise ValueError(f"Invalid volume entry {entry!r}; each entry must be [host_path, vm_path, 'ro'|'rw']")
             if not Path(entry[0]).is_absolute():
                 raise ValueError(f"Volume host path must be absolute: {entry[0]!r}")
-            if not Path(entry[1]).is_absolute():
+            if not PurePosixPath(entry[1]).is_absolute():
                 raise ValueError(f"Volume VM path must be absolute: {entry[1]!r}")
         return v

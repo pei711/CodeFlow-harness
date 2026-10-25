@@ -102,21 +102,23 @@ class DirectExecutor(SandboxExecutor):
             _DEFAULT_TIMEOUT if timeout is None else timeout,
             _MAX_TIMEOUT,
         )
+        from codeflow.utils.subprocess import owned_process_options, stop_process
+
         process = await asyncio.create_subprocess_shell(
             command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
             cwd=cwd,
             env={**_baseline_env(), **(env or {})},
+            **owned_process_options(),
         )
         try:
             stdout_b, stderr_b = await asyncio.wait_for(process.communicate(), timeout=effective_timeout)
+        except asyncio.CancelledError:
+            await stop_process(process, tree=True)
+            raise
         except asyncio.TimeoutError:
-            process.kill()
-            try:
-                await asyncio.wait_for(process.wait(), timeout=5.0)
-            except asyncio.TimeoutError:
-                pass
+            await stop_process(process, tree=True)
             return ExecResult(stdout="", stderr=f"Timed out after {effective_timeout}s", exit_code=-1)
         return ExecResult(
             stdout=stdout_b.decode("utf-8", errors="replace"),

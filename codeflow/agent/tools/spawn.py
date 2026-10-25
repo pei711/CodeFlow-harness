@@ -82,11 +82,15 @@ class SpawnTool(Tool):
                     "type": "string",
                     "description": "Optional short label for the task (for display)",
                 },
+                "development": {
+                    "type": "boolean",
+                    "description": "Explicitly request an independent Git worktree for a code modification task. Default false; not for chat or reads. Starts from committed HEAD; retains branch and edits for review.",
+                },
             },
             "required": ["task"],
         }
 
-    async def execute(self, task: str, label: str | None = None, **kwargs: Any) -> str:
+    async def execute(self, task: str, label: str | None = None, development: bool = False, **kwargs: Any) -> str:
         """把给定 ``task`` 交给 Manager 创建 Subagent，并返回 Manager 的执行结果文本。
 
         调用会读取当前 `_SpawnOrigin`，把 origin_channel、origin_chat_id、session_key 与可选 label
@@ -100,4 +104,5 @@ class SpawnTool(Tool):
             origin_channel=org.channel,
             origin_chat_id=org.chat_id,
             session_key=org.session_key,
+            **({"development": True} if development else {}),
         )

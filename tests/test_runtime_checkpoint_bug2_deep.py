@@ -54,7 +54,12 @@ async def test_d1_symlink_snapshotted_as_symlink(workspace):
     itself, not the target — so the snapshot doesn't accidentally inline a
     large target or pull in out-of-workspace files."""
     (workspace / "target.txt").write_text("real\n", encoding="utf-8")
-    (workspace / "link.txt").symlink_to("target.txt")
+    try:
+        (workspace / "link.txt").symlink_to("target.txt")
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip("Windows account lacks the symbolic-link privilege")
+        raise
     svc = CheckpointService(workspace)
     cid, changed = await svc.commit_turn("t1")
     assert cid is not None
@@ -89,6 +94,7 @@ async def test_d1_file_to_directory_transition(workspace):
     assert "thing" in changed or "thing/x.py" in changed
 
 
+@pytest.mark.skipif(os.name == "nt", reason="Windows chmod cannot set the POSIX executable bit")
 async def test_d1_chmod_only_change_captured(workspace):
     """Mode-bit change (e.g. chmod +x on a script) without content change is
     still a recoverable diff — git tracks executable bit and we want recovery

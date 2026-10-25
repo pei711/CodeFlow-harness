@@ -339,11 +339,11 @@ async def test_outlet_emit_complete_and_error_shapes():
     ]
 
 
-async def test_build_tui_defaults_to_single_slot_pools():
+async def test_build_tui_defaults_to_four_user_two_system_slots():
     scheduler, _hub, _turn_ids, _submission_ids, teardown = build_tui(_RunTurnLoop(events=[]), FakeEmitter())
     try:
-        assert scheduler._pools._user._value == 1
-        assert scheduler._pools._system._value == 1
+        assert scheduler._pools._user._value == 4
+        assert scheduler._pools._system._value == 2
     finally:
         await teardown()
 

@@ -14,12 +14,14 @@ def _small_config() -> SchedulerExperimentConfig:
         hol_cycles=2,
         hol_regular_sessions=8,
         hol_hot_turns_per_cycle=3,
-        foreground_delay_ms=1,
-        hot_delay_ms=3,
+        # Keep the causal delay gap above Windows' coarse timer resolution.
+        # Frozen benchmark defaults and the 10,000-request track are unchanged.
+        foreground_delay_ms=20,
+        hot_delay_ms=80,
         bulkhead_user_sessions=8,
         bulkhead_turns_per_session=2,
         background_tasks=6,
-        background_delay_ms=10,
+        background_delay_ms=160,
     )
 
 
