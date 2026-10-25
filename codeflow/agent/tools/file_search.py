@@ -21,6 +21,7 @@ from typing import Any
 
 from codeflow.agent.tools.execution import ToolCapability, ToolEffect
 from codeflow.agent.tools.filesystem import _FsTool
+from codeflow.utils.async_io import run_blocking_io
 
 # 纯 Python 回退和 find 跳过的噪声目录。ripgrep 通过 .gitignore 自行处理忽略逻辑，
 # 因此此集合只限制回退路径。
@@ -173,7 +174,9 @@ class GrepTool(_FsTool):
         try:
             if rg:
                 return await self._run_rg(rg, pattern, base, glob, output_mode, case_insensitive, context, cap)
-            return self._run_python(pattern, base, glob, output_mode, case_insensitive, context, cap)
+            return await run_blocking_io(
+                self._run_python, pattern, base, glob, output_mode, case_insensitive, context, cap
+            )
         except Exception as e:
             return f"Error running grep: {e}"
 
@@ -411,6 +414,9 @@ class FindTool(_FsTool):
         limit: int | None = None,
         **kwargs: Any,
     ) -> str:
+        return await run_blocking_io(self._execute_sync, pattern, path, limit)
+
+    def _execute_sync(self, pattern: str, path: str, limit: int | None) -> str:
         cap = limit or self._DEFAULT_LIMIT
         try:
             base = self._resolve(path)

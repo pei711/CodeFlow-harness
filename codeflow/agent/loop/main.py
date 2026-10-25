@@ -425,6 +425,8 @@ class AgentLoop:
         self._executor_stack: AsyncExitStack | None = None
         self._executor_started: bool = False
         self._executor_start_lock = asyncio.Lock()
+        self._executor_turn_users = 0
+        self._executor_reset_pending = False
         self._debug_server: SandboxDebugServer | None = None
 
         self.router = router
@@ -434,6 +436,7 @@ class AgentLoop:
         self._mcp_stack: AsyncExitStack | None = None
         self._mcp_connected = False
         self._mcp_connecting = False
+        self._mcp_connect_lock = asyncio.Lock()
         self._processing_lock = asyncio.Lock()
         # 每个已分派 Turn 结束后触发，无论成功、错误还是取消。回调必须低成本且不得抛错。
         self.on_turn_complete: list[Callable[[], None]] = []
@@ -916,8 +919,8 @@ class AgentLoop:
     async def _connect_mcp(self) -> None:
         """在首次需要时一次性连接已配置的 MCP servers，并注册其 Tool。
 
-        已连接、正在连接或没有配置时立即返回。方法在第一个 ``await`` 前设置
-        `_mcp_connecting`，利用 asyncio 单线程任务切换边界阻止重复连接；随后确保 Sandbox
+        已连接或没有配置时立即返回。并发 Turn 等待同一个初始化锁，避免在部分注册的
+        Tool 集合上继续执行；随后确保 Sandbox
         executor 已启动，用独立 `AsyncExitStack` 承担 MCP 连接的关闭责任，并把远端 Tool
         加入当前 `ToolRegistry`。连接后再次执行 `_apply_disabled_tools`，使黑名单也覆盖
         动态加入的 ``mcp_<server>_search`` 等名称。
@@ -925,10 +928,14 @@ class AgentLoop:
         任一步失败都会复位 connecting 标志、关闭部分建立的 stack 并重新抛出异常，因此
         当前 Turn 能准确失败，后续调用也仍有机会重试，而不会永久停在“正在连接”状态。
         """
-        if self._mcp_connected or self._mcp_connecting or not self._mcp_servers:
+        async with self._mcp_connect_lock:
+            await self._connect_mcp_locked()
+
+    async def _connect_mcp_locked(self) -> None:
+        if self._mcp_connected or not self._mcp_servers:
             return
-        # 在第一个 await 之前同步设置标志。asyncio 单线程执行，此处不会发生上下文切换，
-        # 该互斥模式无需锁。
+        self._unregister_mcp_tools()
+        # 仅连接初始化持锁，模型与工具执行不占用此锁。
         self._mcp_connecting = True
         try:
             await self._start_executor()  # MCP 服务器连接前，执行器必须已启动
@@ -947,7 +954,7 @@ class AgentLoop:
             self._apply_disabled_tools()
             self._mcp_connected = True
             self._mcp_connecting = False
-        except Exception:
+        except BaseException:
             # 重置进行中标志，使后续调用可重试。
             self._mcp_connecting = False
             if self._mcp_stack:
@@ -957,6 +964,23 @@ class AgentLoop:
                     pass
                 self._mcp_stack = None
             raise
+
+    def _unregister_mcp_tools(self) -> None:
+        from codeflow.agent.tools.mcp import MCPToolWrapper
+
+        for name in self.tools.tool_names:
+            if isinstance(self.tools.get(name), MCPToolWrapper):
+                self.tools.unregister(name)
+
+    async def _finish_executor_turn(self) -> None:
+        # No await before dropping the lease. Start/close share one short
+        # lifecycle lock; other Turns never hold it during model/tool work.
+        self._executor_turn_users -= 1
+        if self._executor_reset_pending:
+            async with self._executor_start_lock:
+                if self._executor_turn_users == 0:
+                    await self.close_mcp()
+                    self._executor_reset_pending = False
 
     def _set_tool_context(
         self, channel: str, chat_id: str, message_id: str | None = None, session_key: str | None = None
@@ -1682,6 +1706,7 @@ class AgentLoop:
             self._mcp_stack = None
         self._mcp_connected = False  # 重置后 _connect_mcp() 才能在关闭后重连
         self._mcp_connecting = False  # 重置以免并发调用方永久阻塞
+        self._unregister_mcp_tools()
         await self.close_executor()  # 即使未配置 MCP 服务器也始终执行
 
     async def close(self) -> None:
@@ -2259,6 +2284,7 @@ class AgentLoop:
 
         if usage_sink is None:
             usage_sink = {}
+        self._executor_turn_users += 1
         try:
             await self._start_executor()
             await self._connect_mcp()
@@ -2275,11 +2301,16 @@ class AgentLoop:
                 context_metadata_sink=context_metadata,
             )
         except Exception:
-            await self.close_executor()
+            # One failed conversation must not tear down a Sandbox still in
+            # use by another. Defer its reset until the final Turn releases it.
+            self._executor_reset_pending = True
             raise
         finally:
             if cron_token is not None and isinstance(cron_tool, CronTool):
                 cron_tool.reset_cron_context(cron_token)
+            from codeflow.spine._barrier import finish_barrier
+
+            await finish_barrier(asyncio.create_task(self._finish_executor_turn()))
 
         # 单一的返回到发出边界（N-UNIFORM）。MediaOut 独立于流，并先于 Text
         # （G-MEDIA-2(a)：当前顺序为媒体优先）。

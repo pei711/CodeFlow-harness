@@ -6,12 +6,28 @@ READ effect，Write/Edit 声明 WRITE；返回值统一为模型可读文本，�
 """
 
 import difflib
+import hashlib
 import os
 from pathlib import Path
 from typing import Any
 
 from codeflow.agent.tools.base import Tool
 from codeflow.agent.tools.execution import ToolCapability, ToolEffect, ToolInvocation
+from codeflow.utils.async_io import run_blocking_io
+from codeflow.utils.atomic_file import atomic_write_bytes
+
+
+def _version_matches(path: Path, expected: str | None) -> bool:
+    if expected is None:
+        return True
+    actual = hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else "missing"
+    return actual == expected.lower()
+
+
+_EXPECTED_VERSION_SCHEMA = {
+    "type": "string",
+    "description": "SHA256 from read_file, or 'missing' to require a new file. Rejects stale writes. Recommended for shared files.",
+}
 
 
 def _resolve_path(path: str, workspace: Path | None = None, allowed_dir: Path | None = None) -> Path:
@@ -48,7 +64,7 @@ class _FsTool(Tool):
         return _resolve_path(path, self._workspace, self._allowed_dir)
 
     def resource_key(self, invocation: ToolInvocation) -> str | None:
-        path = invocation.arguments.get("path")
+        path = invocation.arguments.get("path", ".")
         if not isinstance(path, str) or not path:
             return None
         return os.path.normcase(str(self._resolve(path)))
@@ -102,6 +118,9 @@ class ReadFileTool(_FsTool):
         }
 
     async def execute(self, path: str, offset: int = 1, limit: int | None = None, **kwargs: Any) -> str:
+        return await run_blocking_io(self._execute_sync, path, offset, limit)
+
+    def _execute_sync(self, path: str, offset: int, limit: int | None) -> str:
         try:
             fp = self._resolve(path)
             if not fp.exists():
@@ -109,13 +128,15 @@ class ReadFileTool(_FsTool):
             if not fp.is_file():
                 return f"Error: Not a file: {path}"
 
-            all_lines = fp.read_text(encoding="utf-8").splitlines()
+            raw = fp.read_bytes()
+            version = hashlib.sha256(raw).hexdigest()
+            all_lines = raw.decode("utf-8").splitlines()
             total = len(all_lines)
 
             if offset < 1:
                 offset = 1
             if total == 0:
-                return f"(Empty file: {path})"
+                return f"(Empty file: {path})\n(SHA256: {version})"
             if offset > total:
                 return f"Error: offset {offset} is beyond end of file ({total} lines)"
 
@@ -138,7 +159,7 @@ class ReadFileTool(_FsTool):
                 result += f"\n\n(Showing lines {offset}-{end} of {total}. Use offset={end + 1} to continue.)"
             else:
                 result += f"\n\n(End of file — {total} lines total)"
-            return result
+            return result + f"\n(SHA256: {version})"
         except PermissionError as e:
             return f"Error: {e}"
         except Exception as e:
@@ -152,7 +173,7 @@ class ReadFileTool(_FsTool):
 class WriteFileTool(_FsTool):
     """以 UTF-8 把完整 content 写入目标文件，必要时创建 Parent 目录。
 
-    这是覆盖式 WRITE Tool，不做 append、merge 或旧内容校验；调用方应在修改前先读取并理解
+    这是覆盖式 WRITE Tool，可用 expected_sha256 校验旧内容；调用方应在修改前先读取并理解
     文件。路径通过 `_resolve` 检查 allowed_dir，写入成功返回字符长度与 resolved path，权限或
     I/O 失败返回 Error。该方法可能替换既有文件，不能视为可逆操作。
     """
@@ -174,15 +195,20 @@ class WriteFileTool(_FsTool):
             "properties": {
                 "path": {"type": "string", "description": "The file path to write to"},
                 "content": {"type": "string", "description": "The content to write"},
+                "expected_sha256": _EXPECTED_VERSION_SCHEMA,
             },
             "required": ["path", "content"],
         }
 
-    async def execute(self, path: str, content: str, **kwargs: Any) -> str:
+    async def execute(self, path: str, content: str, expected_sha256: str | None = None, **kwargs: Any) -> str:
+        return await run_blocking_io(self._execute_sync, path, content, expected_sha256)
+
+    def _execute_sync(self, path: str, content: str, expected_sha256: str | None) -> str:
         try:
             fp = self._resolve(path)
-            fp.parent.mkdir(parents=True, exist_ok=True)
-            fp.write_text(content, encoding="utf-8")
+            if not _version_matches(fp, expected_sha256):
+                return f"Error: write conflict: {path} changed since read; read it again before retrying."
+            atomic_write_bytes(fp, content.encode("utf-8"))
             return f"Successfully wrote {len(content)} bytes to {fp}"
         except PermissionError as e:
             return f"Error: {e}"
@@ -255,6 +281,7 @@ class EditFileTool(_FsTool):
                 "path": {"type": "string", "description": "The file path to edit"},
                 "old_text": {"type": "string", "description": "The text to find and replace"},
                 "new_text": {"type": "string", "description": "The text to replace with"},
+                "expected_sha256": _EXPECTED_VERSION_SCHEMA,
                 "replace_all": {
                     "type": "boolean",
                     "description": "Replace all occurrences (default false)",
@@ -269,12 +296,20 @@ class EditFileTool(_FsTool):
         old_text: str,
         new_text: str,
         replace_all: bool = False,
+        expected_sha256: str | None = None,
         **kwargs: Any,
+    ) -> str:
+        return await run_blocking_io(self._execute_sync, path, old_text, new_text, replace_all, expected_sha256)
+
+    def _execute_sync(
+        self, path: str, old_text: str, new_text: str, replace_all: bool, expected_sha256: str | None
     ) -> str:
         try:
             fp = self._resolve(path)
             if not fp.exists():
                 return f"Error: File not found: {path}"
+            if not _version_matches(fp, expected_sha256):
+                return f"Error: write conflict: {path} changed since read; read it again before retrying."
 
             raw = fp.read_bytes()
             uses_crlf = b"\r\n" in raw
@@ -294,7 +329,7 @@ class EditFileTool(_FsTool):
             if uses_crlf:
                 new_content = new_content.replace("\n", "\r\n")
 
-            fp.write_bytes(new_content.encode("utf-8"))
+            atomic_write_bytes(fp, new_content.encode("utf-8"))
             return f"Successfully edited {fp}"
         except PermissionError as e:
             return f"Error: {e}"
@@ -396,6 +431,9 @@ class ListDirTool(_FsTool):
         max_entries: int | None = None,
         **kwargs: Any,
     ) -> str:
+        return await run_blocking_io(self._execute_sync, path, recursive, max_entries)
+
+    def _execute_sync(self, path: str, recursive: bool, max_entries: int | None) -> str:
         try:
             dp = self._resolve(path)
             if not dp.exists():

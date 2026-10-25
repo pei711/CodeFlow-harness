@@ -503,7 +503,7 @@ class BoxliteExecutor(SandboxExecutor):
         host_path = Path(cwd).resolve()
         try:
             rel = host_path.relative_to(self._workspace.resolve())
-            rel_str = str(rel)
+            rel_str = rel.as_posix()
             return self.WORKSPACE_MOUNT if rel_str == "." else f"{self.WORKSPACE_MOUNT}/{rel_str}"
         except ValueError:
             logger.warning("cwd '%s' is outside workspace; falling back to /workspace", cwd)

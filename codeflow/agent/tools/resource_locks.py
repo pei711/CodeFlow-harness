@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import AsyncIterator
 
+from codeflow.spine._barrier import finish_barrier
+
 
 @dataclass(eq=False)
 class _Request:
@@ -73,9 +75,13 @@ class ResourceLockManager:
         try:
             yield
         finally:
-            async with self._condition:
-                self._active.remove(request)
-                self._condition.notify_all()
+
+            async def release() -> None:
+                async with self._condition:
+                    self._active.remove(request)
+                    self._condition.notify_all()
+
+            await finish_barrier(asyncio.create_task(release()))
 
     def read(self, resource: str | os.PathLike[str]):
         """Acquire a shared lock; compatible readers may proceed together."""

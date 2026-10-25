@@ -104,8 +104,8 @@ def build_repl(
     render_error: Callable[[str], None] | None = None,
     send_progress: bool = False,
     send_tool_hints: bool = False,
-    user_pool: int = 1,
-    system_pool: int = 1,
+    user_pool: int = 4,
+    system_pool: int = 2,
 ) -> tuple[Scheduler, DeliveryHub, Callable[[], Awaitable[None]]]:
     """Wire the spine pieces a REPL turn flows through: a hub with the channel's
     CliOutlet registered, and a Scheduler whose runner bridges the agent loop and
