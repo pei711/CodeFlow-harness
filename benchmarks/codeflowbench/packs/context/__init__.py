@@ -26,6 +26,7 @@ from .tasks import (
     CALIBRATION_CONTEXT_TASK_COUNT,
     FORMAL_CONTEXT_TASK_COUNT,
     context_task_set_digest,
+    load_context_budget_study_tasks,
     load_context_tasks,
 )
 from .verifier import SealedContextTaskVerifier
@@ -54,6 +55,7 @@ __all__ = [
     "build_full_history_context_engine",
     "context_engine_factory_for",
     "context_task_set_digest",
+    "load_context_budget_study_tasks",
     "load_context_tasks",
     "reduce_context_artifacts",
 ]

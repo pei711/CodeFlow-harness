@@ -2,8 +2,9 @@
 
 `ToolRegistry` 是模型 function name 到具体 Tool 实现的唯一目录。它把定义暴露给 Provider，
 执行时统一完成类型转换、Schema 校验、超时、异常与 `ToolResult.failed` 归一化；批量调用只让
-``READ + concurrency_safe`` 的连续段并行，其余副作用调用保持原顺序。Registry 不判断 Tool
-业务权限，也不把 Tool Result 当成用户任务完成证据。
+``READ + concurrency_safe`` 的连续段并行，其余副作用调用保持原顺序。声明资源键的 Tool 还会
+通过共享/独占资源锁协调同一路径及目录子树的访问；该锁管理器可由 Host 与 Subagent 共用，但
+不会协调外部进程。Registry 不判断 Tool 业务权限，也不把 Tool Result 当成用户任务完成证据。
 """
 
 import asyncio
@@ -19,6 +20,7 @@ from codeflow.agent.tools.execution import (
     ToolExecutionContext,
     ToolInvocation,
 )
+from codeflow.agent.tools.resource_locks import ResourceLockManager
 from codeflow.tracing import semconv, trace
 
 ToolStartCallback = Callable[[ToolInvocation], Awaitable[None]]
@@ -29,9 +31,9 @@ class ToolRegistry:
     """提供 Agent Tool 动态注册、查找、定义导出与受控执行的注册表。
 
     实例按 Tool ``name`` 保存实现，可在启动、Plugin 激活或 MCP 连接时增删。`execute` 形成单
-    调用安全边界，`execute_many` 根据 capability 将连续安全 Read 分批并行，同时通过
-    on_start/on_complete 保持 ToolEvent 观察。默认并发为 4，未自设超时的 Tool 最多运行 300
-    秒；Ask User 等 ``blocking_interaction`` 不套该上限。
+    调用安全边界，并按 Tool 声明的资源键获取共享读锁或独占写锁；`execute_many` 根据 capability
+    将连续安全 Read 分批并行，同时通过 on_start/on_complete 保持 ToolEvent 观察。默认并发为 4，
+    未自设超时的 Tool 最多运行 300 秒；Ask User 等 ``blocking_interaction`` 不套该上限。
 
     注册表长期由 AgentLoop 持有，但 ToolExecutionContext 按调用携带 call_id、Session、迭代与
     Origin，不能把一次 Turn 的观察状态放进 Registry 全局字段。
@@ -42,11 +44,17 @@ class ToolRegistry:
     DEFAULT_TOOL_TIMEOUT_S = 300.0
     DEFAULT_MAX_PARALLEL = 4
 
-    def __init__(self, *, max_parallel: int = DEFAULT_MAX_PARALLEL):
+    def __init__(
+        self,
+        *,
+        max_parallel: int = DEFAULT_MAX_PARALLEL,
+        resource_locks: ResourceLockManager | None = None,
+    ):
         if max_parallel < 1:
             raise ValueError("max_parallel must be positive")
         self._tools: dict[str, Tool] = {}
         self._max_parallel = max_parallel
+        self._resource_locks = resource_locks or ResourceLockManager()
 
     def register(self, tool: Tool, *, replace: bool = False) -> None:
         """按稳定名称注册一个 Tool，并显式控制同名覆盖。
@@ -139,12 +147,25 @@ class ToolRegistry:
                 )
 
             ceiling = tool.timeout_seconds or self.DEFAULT_TOOL_TIMEOUT_S
+
+            normalized_invocation = ToolInvocation(name=name, arguments=params, context=invocation.context)
+            resource_key = tool.resource_key(normalized_invocation)
+
+            async def _execute_with_resource_lock() -> str:
+                if resource_key is None:
+                    return await tool.execute_with_context(invocation.context, **params)
+                if tool.capability.effect is ToolEffect.READ:
+                    async with self._resource_locks.read(resource_key):
+                        return await tool.execute_with_context(invocation.context, **params)
+                async with self._resource_locks.write(resource_key):
+                    return await tool.execute_with_context(invocation.context, **params)
+
             if tool.blocking_interaction:
                 # 该工具有意等待人类，不得被超时计时器终止。
-                result = await tool.execute_with_context(invocation.context, **params)
+                result = await _execute_with_resource_lock()
             else:
                 result = await asyncio.wait_for(
-                    tool.execute_with_context(invocation.context, **params),
+                    _execute_with_resource_lock(),
                     timeout=ceiling,
                 )
 

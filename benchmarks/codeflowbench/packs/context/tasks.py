@@ -48,6 +48,24 @@ def context_task_set_digest(track: ContextTrack) -> str:
     )
 
 
+def load_context_budget_study_tasks() -> tuple[ContextTask, ...]:
+    """Return ten distinct frozen tasks for the exploratory budget-ratio study.
+
+    The study includes every formal task and the first two calibration task IDs
+    in lexical order. The selection is deterministic and each task has its own
+    sealed expected artifact.
+    """
+    formal = load_context_tasks(ContextTrack.FORMAL)
+    calibration = sorted(
+        load_context_tasks(ContextTrack.CALIBRATION),
+        key=lambda task: task.task_id,
+    )
+    selected = (*formal, *calibration[:2])
+    if len(selected) != 10 or len({task.task_id for task in selected}) != 10:
+        raise ValueError("the context budget study requires ten distinct frozen tasks")
+    return selected
+
+
 def _parse_task(track: ContextTrack, raw: Any) -> ContextTask:
     if not isinstance(raw, dict):
         raise ValueError("Context task entries must be objects")
@@ -62,6 +80,11 @@ def _parse_task(track: ContextTrack, raw: Any) -> ContextTask:
     forbidden = raw.get("forbidden_paths")
     if not isinstance(forbidden, list) or not forbidden:
         raise ValueError("Context task requires forbidden_paths")
+    output_properties = raw.get("output_properties", {})
+    if not isinstance(output_properties, dict) or any(
+        not isinstance(value, dict) for value in output_properties.values()
+    ):
+        raise ValueError("Context output_properties must map field names to schemas")
     task = ContextTask(
         task_id=_required_str(raw, "task_id"),
         track=track,
@@ -88,6 +111,7 @@ def _parse_task(track: ContextTrack, raw: Any) -> ContextTask:
             for path in forbidden
         ),
         expected_path=expected_path,
+        output_properties=output_properties,
     )
     if task.message_count < 30 or task.message_count > 80:
         raise ValueError(f"{task.task_id} message_count must be within [30, 80]")
@@ -97,6 +121,8 @@ def _parse_task(track: ContextTrack, raw: Any) -> ContextTask:
     expected = json.loads(task.expected_path.read_text(encoding="utf-8"))
     expected_keys = set(expected) if isinstance(expected, dict) else set()
     declared_keys = set(task.constraint_keys) | set(task.decision_keys)
+    if not set(output_properties).issubset(declared_keys):
+        raise ValueError(f"{task.task_id} output schema names undeclared fields")
     if set(task.constraint_keys) & set(task.decision_keys):
         raise ValueError(f"{task.task_id} Context scoring keys overlap")
     if declared_keys != expected_keys:
@@ -129,4 +155,5 @@ __all__ = [
     "FORMAL_CONTEXT_TASK_COUNT",
     "context_task_set_digest",
     "load_context_tasks",
+    "load_context_budget_study_tasks",
 ]

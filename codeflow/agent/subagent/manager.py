@@ -11,6 +11,7 @@ import json
 import time
 import uuid
 from collections import deque
+from contextvars import ContextVar
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -18,15 +19,18 @@ from typing import Any
 
 from loguru import logger
 
+from codeflow.agent.subagent.worktree import GitWorktreeManager
 from codeflow.agent.tools.base import ToolResult
 from codeflow.agent.tools.filesystem import EditFileTool, ListDirTool, ReadFileTool, WriteFileTool
 from codeflow.agent.tools.registry import ToolRegistry
+from codeflow.agent.tools.resource_locks import ResourceLockManager
 from codeflow.agent.tools.shell import ExecTool
 from codeflow.agent.tools.web import WebFetchTool, WebSearchTool
 from codeflow.config.schema import ExecToolConfig
 from codeflow.providers.base import LLMProvider
 from codeflow.sandbox import SandboxConfig, build_executor
 from codeflow.security.trust import wrap_untrusted
+from codeflow.spine._barrier import finish_barrier
 from codeflow.tracing import semconv, trace
 from codeflow.utils.helpers import build_assistant_message
 
@@ -82,6 +86,7 @@ class SubagentManager:
         max_concurrent: int = 4,
         max_spawns_per_hour: int = 30,
         state: Path | None = None,
+        resource_locks: ResourceLockManager | None = None,
     ):
         from codeflow.config.schema import ExecToolConfig
 
@@ -100,6 +105,7 @@ class SubagentManager:
         self.restrict_to_workspace = restrict_to_workspace
         self._sandbox_config = sandbox_config
         self._owned_ids = owned_ids
+        self._resource_locks = resource_locks or ResourceLockManager()
         self._running_tasks: dict[str, asyncio.Task[SubagentOutcome]] = {}
         self._session_tasks: dict[str, set[str]] = {}  # 会话键 -> {任务 ID, ...}
         self._gate = asyncio.Semaphore(max_concurrent)
@@ -107,6 +113,14 @@ class SubagentManager:
         # 按会话保存单调的启动时间戳，而非按进程，避免一个繁忙会话限流其他会话。
         # 每次访问都将双端队列剪裁到滚动窗口内，因此容量自动有界。
         self._session_spawn_times: dict[str, deque[float]] = {}
+        self._development_tasks: set[str] = set()
+        self._task_workspace: ContextVar[Path | None] = ContextVar("subagent_workspace", default=None)
+        development_state = (
+            self.state / "development_tasks"
+            if self.state != workspace
+            else workspace / ".codeflow" / "development_tasks"
+        )
+        self.worktrees = GitWorktreeManager(workspace, development_state)
 
     async def spawn(
         self,
@@ -115,6 +129,7 @@ class SubagentManager:
         origin_channel: str = "cli",
         origin_chat_id: str = "direct",
         session_key: str | None = None,
+        development: bool = False,
     ) -> str:
         """为 ``task`` 创建后台 Subagent，并立即返回可追踪的 Started Receipt。
 
@@ -149,6 +164,8 @@ class SubagentManager:
         task_id = str(uuid.uuid4())[:8]
         display_label = label or task[:30] + ("..." if len(task) > 30 else "")
         origin = {"channel": origin_channel, "chat_id": origin_chat_id, "session_key": quota_key}
+        if development:
+            self._development_tasks.add(task_id)
 
         bg_task = asyncio.create_task(self._run_subagent(task_id, task, display_label, origin))
         self._running_tasks[task_id] = bg_task
@@ -157,6 +174,7 @@ class SubagentManager:
 
         def _cleanup(_: asyncio.Task[SubagentOutcome]) -> None:
             self._running_tasks.pop(task_id, None)
+            self._development_tasks.discard(task_id)
             if session_key and (ids := self._session_tasks.get(session_key)):
                 ids.discard(task_id)
                 if not ids:
@@ -184,17 +202,44 @@ class SubagentManager:
         """
         logger.info("Subagent [{}] starting task: {}", task_id, label)
 
+        workspace_token = None
+        terminal_status = "failed"
+        terminal_error = None
         try:
             # 每个子 Agent 运行独立沙箱虚拟机，需限制数量，避免大规模扇出耗尽宿主机资源。
             async with self._gate:
-                executor = build_executor(self._sandbox_config, self.workspace, self._owned_ids)
+                if task_id in self._development_tasks:
+                    record = await self.worktrees.create(task_id)
+                    workspace_token = self._task_workspace.set(record.path)
+                workspace = self._task_workspace.get() or self.workspace
+                executor = build_executor(self._sandbox_config, workspace, self._owned_ids)
                 async with executor:
                     outcome = await self._run_subagent_inner(task_id, task, label, origin, executor)
+                terminal_status = outcome.status.value
         except asyncio.CancelledError:
+            terminal_status = "cancelled"
             raise
         except Exception as e:
             logger.error("Subagent [{}] failed: {}", task_id, e)
+            terminal_error = str(e)
             outcome = SubagentOutcome(SubagentStatus.FAILED, f"Error: {str(e)}")
+        finally:
+            if workspace_token is not None:
+                self._task_workspace.reset(workspace_token)
+            if task_id in self.worktrees.records:
+
+                async def record_terminal() -> None:
+                    await self.worktrees.finish(task_id, terminal_status, terminal_error)
+
+                await finish_barrier(asyncio.create_task(record_terminal()))
+
+        if task_id in self.worktrees.records:
+            record = self.worktrees.records[task_id]
+            outcome = SubagentOutcome(
+                outcome.status,
+                f"{outcome.result}\nDevelopment workspace: {record.path}\nBranch: {record.branch}\n"
+                f"HEAD: {record.head}; dirty: {record.dirty}. Retained for review; not merged.",
+            )
 
         await self._announce_result(task_id, label, task, outcome.result, origin, outcome.status)
         return outcome
@@ -209,17 +254,19 @@ class SubagentManager:
     ) -> SubagentOutcome:
         try:
             # 构建子 Agent 工具，不包含 message 和 spawn
-            tools = ToolRegistry()
-            allowed_dir = self.workspace if self.restrict_to_workspace else None
-            tools.register(ReadFileTool(workspace=self.workspace, allowed_dir=allowed_dir))
-            tools.register(WriteFileTool(workspace=self.workspace, allowed_dir=allowed_dir))
-            tools.register(EditFileTool(workspace=self.workspace, allowed_dir=allowed_dir))
-            tools.register(ListDirTool(workspace=self.workspace, allowed_dir=allowed_dir))
+            tools = ToolRegistry(resource_locks=self._resource_locks)
+            workspace = self._task_workspace.get() or self.workspace
+            isolated = self._task_workspace.get() is not None
+            allowed_dir = workspace if self.restrict_to_workspace or isolated else None
+            tools.register(ReadFileTool(workspace=workspace, allowed_dir=allowed_dir))
+            tools.register(WriteFileTool(workspace=workspace, allowed_dir=allowed_dir))
+            tools.register(EditFileTool(workspace=workspace, allowed_dir=allowed_dir))
+            tools.register(ListDirTool(workspace=workspace, allowed_dir=allowed_dir))
             tools.register(
                 ExecTool(
-                    working_dir=str(self.workspace),
+                    working_dir=str(workspace),
                     timeout=self.exec_config.timeout,
-                    restrict_to_workspace=self.restrict_to_workspace,
+                    restrict_to_workspace=self.restrict_to_workspace or isolated,
                     path_append=self.exec_config.path_append,
                     executor=executor,
                 )
@@ -365,9 +412,10 @@ Summarize this naturally for the user. Keep it brief (1-2 sentences). Do not men
         from codeflow.agent.context import ContextBuilder
         from codeflow.memory_engine.skill_forge import LocalSkillCatalog
 
+        workspace = self._task_workspace.get() or self.workspace
         # 使用临时 ContextBuilder 访问运行时上下文构建器，因为 SubagentManager 没有自己的实例。
         time_ctx = ContextBuilder(
-            self.workspace,
+            workspace,
             state=self.state,
             start_watcher=False,
         )._build_runtime_context(None, None)
@@ -380,8 +428,16 @@ You are a subagent spawned by the main agent to complete a specific task.
 Stay focused on the assigned task. Your final response will be reported back to the main agent.
 
 ## Workspace
-{self.workspace}"""
+{workspace}"""
         ]
+        if self._task_workspace.get() is not None:
+            parts.append(
+                "This is an isolated development worktree based on committed HEAD. "
+                "Keep edits and tests in this workspace. Review your diff and commit only task files "
+                "to the current feature branch if the configured sandbox permits Git writes. "
+                "Otherwise retain edits and report pending commit. Never merge, switch, reset, or delete branches. "
+                "A final answer is not integration approval; the main agent must review and verify."
+            )
 
         skills_summary = LocalSkillCatalog(
             self.state,

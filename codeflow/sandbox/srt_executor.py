@@ -29,12 +29,14 @@ class SrtExecutor(SandboxExecutor):
     ) -> None:
         self._workspace = workspace.resolve()
         package_root = Path(__file__).resolve().parents[2]
-        self._cli_path = Path(
-            cli_path or package_root / "node_modules" / "@anthropic-ai" / "sandbox-runtime" / "dist" / "cli.js"
-        ).expanduser().resolve()
-        self._settings_path = Path(
-            settings_path or Path(__file__).with_name("srt-settings.json")
-        ).expanduser().resolve()
+        self._cli_path = (
+            Path(cli_path or package_root / "node_modules" / "@anthropic-ai" / "sandbox-runtime" / "dist" / "cli.js")
+            .expanduser()
+            .resolve()
+        )
+        self._settings_path = (
+            Path(settings_path or Path(__file__).with_name("srt-settings.json")).expanduser().resolve()
+        )
 
     @property
     def supports_process_spawning(self) -> bool:
@@ -77,6 +79,8 @@ class SrtExecutor(SandboxExecutor):
         if not working_dir.is_relative_to(self._workspace):
             raise SandboxInitError(f"SRT command working directory escapes workspace: {working_dir}")
         effective_timeout = min(_DEFAULT_TIMEOUT if timeout is None else timeout, _MAX_TIMEOUT)
+        from codeflow.utils.subprocess import owned_process_options, stop_process
+
         process = await asyncio.create_subprocess_exec(
             node_path,
             str(self._cli_path),
@@ -88,15 +92,15 @@ class SrtExecutor(SandboxExecutor):
             env=child_env,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
+            **owned_process_options(),
         )
         try:
             stdout_b, stderr_b = await asyncio.wait_for(process.communicate(), timeout=effective_timeout)
+        except asyncio.CancelledError:
+            await stop_process(process, tree=True)
+            raise
         except asyncio.TimeoutError:
-            process.kill()
-            try:
-                await asyncio.wait_for(process.wait(), timeout=5.0)
-            except asyncio.TimeoutError:
-                pass
+            await stop_process(process, tree=True)
             return ExecResult(stdout="", stderr=f"Command timed out after {effective_timeout}s", exit_code=-1)
         return ExecResult(
             stdout=stdout_b.decode("utf-8", errors="replace"),

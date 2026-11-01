@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from copy import deepcopy
+from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
 from typing import Any
@@ -33,6 +34,7 @@ class ContextTask:
     artifact_path: str
     forbidden_paths: tuple[str, ...]
     expected_path: Path
+    output_properties: dict[str, dict[str, Any]] = field(default_factory=dict)
 
     def materialize_history(self) -> list[dict[str, Any]]:
         filler_turns = (self.message_count - 14) // 2
@@ -162,6 +164,28 @@ class ContextTask:
     def expected_digest(self) -> str:
         return canonical_digest(json.loads(self.expected_path.read_text(encoding="utf-8")))
 
+    @property
+    def output_schema(self) -> dict[str, Any]:
+        """Public shape contract; never inspect the held-out expected values."""
+        keys = sorted(set(self.constraint_keys) | set(self.decision_keys))
+        return {
+            "type": "object",
+            "properties": {key: deepcopy(self.output_properties.get(key, {})) for key in keys},
+            "required": keys,
+            "additionalProperties": False,
+        }
+
+    @property
+    def output_contract(self) -> str:
+        return (
+            f"Output contract for {self.artifact_path}: write exactly one JSON object "
+            "matching the following schema. All listed keys are required; additional "
+            "keys, metadata and annotations are forbidden. Determine every value from "
+            "the conversation history, not from the schema. Read the saved file back "
+            "and verify its complete key set before finishing.\n"
+            + json.dumps(self.output_schema, sort_keys=True, ensure_ascii=False)
+        )
+
     def to_task_spec(self) -> TaskSpec:
         return TaskSpec(
             task_id=self.task_id,
@@ -171,6 +195,8 @@ class ContextTask:
                 "message_count": self.message_count,
                 "history_digest": self.history_digest,
                 "final_prompt": self.final_prompt,
+                "output_schema": self.output_schema,
+                "output_contract": self.output_contract,
                 "constraint_keys": list(self.constraint_keys),
                 "decision_keys": list(self.decision_keys),
                 "artifact_path": self.artifact_path,

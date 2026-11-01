@@ -63,6 +63,8 @@ class OriginPools:
     """
 
     def __init__(self, user: int, system: int):
+        if user < 1 or system < 1:
+            raise ValueError("USER and SYSTEM pool capacities must be positive")
         self._user = asyncio.Semaphore(user)
         self._system = asyncio.Semaphore(system)
 

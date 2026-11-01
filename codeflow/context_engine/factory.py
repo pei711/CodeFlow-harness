@@ -136,7 +136,12 @@ def build_context_engine(
             get_tool_definitions=get_tool_definitions,
         ),
     ]
-    return ContextAssembler(builders, get_tool_definitions, now_fn=now_fn)
+    return ContextAssembler(
+        builders,
+        get_tool_definitions,
+        now_fn=now_fn,
+        context_budget_ratio=config.context_budget_ratio,
+    )
 
 
 def _build_router(

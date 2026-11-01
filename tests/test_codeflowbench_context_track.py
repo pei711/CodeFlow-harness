@@ -18,6 +18,7 @@ from benchmarks.codeflowbench.packs.context import (
     FullHistoryManager,
     SealedContextTaskVerifier,
     assess_context_claim,
+    load_context_budget_study_tasks,
     load_context_tasks,
     reduce_context_artifacts,
 )
@@ -95,6 +96,23 @@ def test_context_role_wrapper_preserves_delegate_error_category() -> None:
     assert provider.classify_error(RuntimeError("budget")).category == "task_budget_exhausted"
 
 
+async def test_context_summary_budget_is_independent_from_main_agent_reply_limit():
+    from codeflow.providers.base import LLMResponse
+
+    class Delegate:
+        generation = GenerationSettings(max_tokens=500)
+
+        async def chat(self, **kwargs):
+            self.requested_max_tokens = kwargs["max_tokens"]
+            return LLMResponse(content="complete summary")
+
+    delegate = Delegate()
+    provider = _RoleScopedProvider(delegate, "context_auxiliary", max_output_tokens=2048)
+    await provider.chat(messages=[{"role": "user", "content": "summarize"}], max_tokens=2048)
+    assert delegate.requested_max_tokens == 2048
+    assert delegate.generation.max_tokens == 500
+
+
 def test_context_trial_binds_curator_to_frozen_campaign_model(
     tmp_path: Path,
 ) -> None:
@@ -112,6 +130,7 @@ def test_context_trial_binds_curator_to_frozen_campaign_model(
     assert trial_codeflow.context.curator_model == "deepseek/deepseek-v4-flash"
     assert trial_config.agents.defaults.max_tokens == 500
     assert trial_codeflow.context.protect_first_n == 1
+    assert trial_codeflow.context.context_budget_ratio == 0.80
 
 
 def test_context_pack_freezes_prompt_budget_and_initial_protection() -> None:
@@ -121,6 +140,90 @@ def test_context_pack_freezes_prompt_budget_and_initial_protection() -> None:
     assert CONTEXT_BENCHMARK_PROTECT_FIRST_N == 1
     assert identity["reserved_output_tokens"] == 500
     assert identity["protected_initial_turns"] == 1
+
+
+def test_public_output_contract_declares_only_shape_without_reading_answers(tmp_path):
+    from dataclasses import replace
+
+    task = replace(load_context_tasks(ContextTrack.FORMAL)[0], expected_path=tmp_path / "unavailable.json")
+    schema = task.output_schema
+    keys = set(task.constraint_keys) | set(task.decision_keys)
+    assert set(schema["properties"]) == set(schema["required"]) == keys
+    assert schema["additionalProperties"] is False
+    assert all(definition == {} for definition in schema["properties"].values())
+    assert "SEV-1" not in task.output_contract
+    assert "Asia/Shanghai" not in task.output_contract
+
+
+def test_output_contract_is_identical_in_both_context_variants():
+    from types import SimpleNamespace
+
+    from benchmarks.codeflowbench.packs.context.runner import _turn_request
+
+    task = load_context_tasks(ContextTrack.FORMAL)[0]
+    texts = []
+    for arm in ["baseline", "governed"]:
+        context = SimpleNamespace(
+            variant=SimpleNamespace(variant_id=arm), key=SimpleNamespace(repetition=0), block_attempt=1
+        )
+        texts.append(_turn_request(task, context).text)
+    assert texts[0] == texts[1]
+    assert task.output_contract in texts[0]
+    assert task.to_task_spec().payload["output_schema"] == task.output_schema
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("extra_key", ["recorded_at", "deployment_window_utc"])
+async def test_extra_fields_still_fail_independent_verifier(tmp_path, extra_key):
+    task = load_context_tasks(ContextTrack.FORMAL)[0]
+    verifier = SealedContextTaskVerifier.capture(task)
+    artifact = tmp_path / task.artifact_path
+    artifact.parent.mkdir(parents=True)
+    expected = json.loads(task.expected_path.read_text(encoding="utf-8"))
+    artifact.write_text(json.dumps({**expected, extra_key: "extra"}), encoding="utf-8")
+    result = await verifier.verify(tmp_path)
+    assert result.result.state is VerificationState.FAILED
+    assert "artifact_mismatch" in result.result.findings
+
+
+def test_strategy_schema_declares_both_choices_without_selecting_latest(tmp_path):
+    from dataclasses import replace
+
+    task = next(task for task in load_context_tasks(ContextTrack.FORMAL) if task.task_id == "ctx-customer-migration")
+    task = replace(task, expected_path=tmp_path / "unavailable.json")
+    schema = task.output_schema
+    assert schema["properties"]["strategy"] == {"type": "string", "enum": ["rolling", "blue-green"]}
+    schema["properties"]["strategy"]["enum"].append("mutated")
+    assert task.output_schema["properties"]["strategy"]["enum"] == ["rolling", "blue-green"]
+
+
+@pytest.mark.asyncio
+async def test_schema_valid_but_superseded_strategy_still_fails_verifier(tmp_path):
+    task = next(task for task in load_context_tasks(ContextTrack.FORMAL) if task.task_id == "ctx-customer-migration")
+    verifier = SealedContextTaskVerifier.capture(task)
+    expected = json.loads(task.expected_path.read_text(encoding="utf-8"))
+    old_strategy = "rolling"
+    assert old_strategy in task.output_schema["properties"]["strategy"]["enum"]
+    artifact = tmp_path / task.artifact_path
+    artifact.parent.mkdir(parents=True)
+    artifact.write_text(json.dumps({**expected, "strategy": old_strategy}), encoding="utf-8")
+    result = await verifier.verify(tmp_path)
+    assert result.result.state is VerificationState.FAILED
+    assert "artifact_mismatch" in result.result.findings
+
+
+def test_context_budget_study_has_ten_unique_tasks_and_three_ratio_arms() -> None:
+    tasks = load_context_budget_study_tasks()
+    pack = ContextPack(
+        tasks=tasks,
+        budget_ratios=(0.50, 0.80, 0.93),
+    ).definition()
+
+    assert len(tasks) == len(pack.tasks) == 10
+    assert [variant.settings["context_budget_ratio"] for variant in pack.variants] == [0.50, 0.80, 0.93]
+    assert len(pack.pairs) == 2
+    assert all(pair.control_variant_id == "budget-50" for pair in pack.pairs)
+    assert {pair.treatment_variant_id for pair in pack.pairs} == {"budget-80", "budget-93"}
 
 
 def test_context_pack_freezes_benchmark_curator_steps_only() -> None:
@@ -705,7 +808,10 @@ async def test_context_pack_resolves_factory_and_rejects_observed_axis_drift(
             metrics={
                 "main_agent_input_tokens": 100,
                 "trial_total_input_tokens": 100,
+                "trial_total_output_tokens": 0,
                 "context_auxiliary_input_tokens": 0,
+                "repeated_tool_calls": 0,
+                "context_budget_ratio": 0.8,
                 "usage_complete": True,
                 "context_path": "fifo_tail",
                 "early_constraint_retained": False,

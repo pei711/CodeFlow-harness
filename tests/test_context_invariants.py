@@ -59,10 +59,11 @@ def _budget() -> TokenBudget:
     return TokenBudget(100_000, 4_000, 2_000, 1_000, 93_000)
 
 
-async def _assemble(builder: ContextBuilder, curator, **kw):
+async def _assemble(builder: ContextBuilder, curator, *, context_budget_ratio: float = 0.80):
     eng = ContextAssembler(
         [IdentitySegmentBuilder(builder.workspace), curator],
         lambda: [],
+        context_budget_ratio=context_budget_ratio,
     )
     return await eng.assemble("s", [], _budget(), turn=TurnContext(current_message="hi"))
 
@@ -73,6 +74,28 @@ async def _assemble(builder: ContextBuilder, curator, **kw):
 
 
 class TestCuratorBoundary:
+    @pytest.mark.parametrize(
+        ("ratio", "expected_context", "expected_history"),
+        [(0.50, 47_000, 23_500), (0.80, 75_200, 37_600), (0.93, 87_420, 43_710)],
+    )
+    def test_context_working_set_uses_configured_window_ratio(
+        self,
+        ratio: float,
+        expected_context: int,
+        expected_history: int,
+    ) -> None:
+        assembler = ContextAssembler(
+            [],
+            lambda: [],
+            context_budget_ratio=ratio,
+        )
+        context_budget, section_budgets = assembler._section_budgets(_budget())
+
+        # 100k context - 4k output - 2k tools = 94k effective tokens.
+        # Half of the configured working set is assigned to history.
+        assert context_budget == expected_context
+        assert section_budgets["history"] == expected_history
+
     async def test_working_state_is_purely_additive_tail(
         self,
         builder: ContextBuilder,

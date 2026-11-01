@@ -44,6 +44,9 @@
       "superseded_after": "Use a blue-green migration for customer ACME-482 with owner migrations.",
       "constraint_keys": ["region"],
       "decision_keys": ["customer_id", "strategy", "owner"],
+      "output_properties": {
+        "strategy": {"type": "string", "enum": ["rolling", "blue-green"]}
+      },
       "noise_topic": "conference-travel",
       "first_tool_label": "customer-inventory-old",
       "second_tool_label": "customer-inventory-current",

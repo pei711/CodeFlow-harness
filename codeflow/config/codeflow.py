@@ -77,6 +77,18 @@ class ContextConfig(_Base):
     fast_path_threshold: float = 0.60
     """Curator Fast Path Cutoff。低于 Budget 此比例时 Zero-LLM Pass-through。"""
 
+    context_budget_ratio: float = Field(default=0.80, gt=0, le=1)
+    """有效上下文窗口中分配给 Context Assembly 的比例。"""
+
+    structured_compact_threshold: float = Field(default=0.95, gt=0, le=1)
+    """CodeFlow 历史达到该可用历史预算比例时触发结构化摘要 Compact。"""
+
+    compact_max_output_tokens: int = Field(default=2048, ge=256, le=8192)
+    """历史摘要的独立输出预算，不沿用主 Agent 的回复长度。"""
+
+    compact_timeout_seconds: float = Field(default=30.0, gt=0)
+    """单次摘要调用的超时；超时后保留原始保护消息并使用确定性摘要。"""
+
     curator_model: str = "gemini-2.5-flash"
     """Curator Agent Loop Slow Path 使用的 Model，默认 Small & Fast；配置不验证 Provider 是否支持。"""
 

@@ -204,11 +204,11 @@ def _wire_real_spine():
     return events, hub, scheduler, teardown
 
 
-async def test_build_repl_defaults_to_single_slot_pools():
+async def test_build_repl_defaults_to_four_user_two_system_slots():
     scheduler, _hub, teardown = build_repl(_EchoLoop(), "cli", lambda t: None)
     try:
-        assert scheduler._pools._user._value == 1
-        assert scheduler._pools._system._value == 1
+        assert scheduler._pools._user._value == 4
+        assert scheduler._pools._system._value == 2
     finally:
         await teardown()
 

@@ -32,6 +32,15 @@ ui-tui/packages/hermes-ink/dist/
 .worktrees/
 logs/
 
+# Local runtime state and test artifacts (not project source).
+/.pytest-tmp/
+/agent_memory/
+/context_memory/
+/sessions/
+/telemetry/
+/user_memory/
+/TOOLS.md
+
 benchmarks/clawbench/results/
 benchmarks/pinchbench/benchmark.log
 benchmarks/pinchbench/results/

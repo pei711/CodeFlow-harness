@@ -49,6 +49,7 @@ _DEFAULT_EXCLUDES = """\
 
 # Self + Python caches
 .codeflow/
+.worktrees/
 __pycache__/
 *.pyc
 *.pyo
@@ -145,6 +146,7 @@ class CheckpointService:
         self._git_dir = candidate
         self._ready = False
         self._commit_count = 0
+        self._transaction_lock = asyncio.Lock()
 
     async def _git(self, *args: str) -> tuple[int, str, str]:
         """针对 Shadow Repo 运行 Git Command，并返回 ``(rc, out, err)``。
@@ -175,6 +177,11 @@ class CheckpointService:
                 proc.communicate(),
                 timeout=_GIT_TIMEOUT_SECONDS,
             )
+        except asyncio.CancelledError:
+            from codeflow.utils.subprocess import stop_process
+
+            await stop_process(proc)
+            raise
         except asyncio.TimeoutError:
             # NFS、索引锁或磁盘已满时，不泄漏僵尸进程，也不让 Turn 挂起。
             # 合成非零返回码，触发调用方的失败降级路径。
@@ -256,6 +263,12 @@ class CheckpointService:
         Init、Add、Commit、Rev-parse 或 OS 任一步失败均 best-effort 返回 ``(None, [])``。这意味着
         “没有 Checkpoint”可能是无变化也可能是 Git Failure，Caller 不能把它当作 Workspace 未改。
         """
+        async with self._transaction_lock:
+            return await self._commit_turn_locked(label)
+
+    async def _commit_turn_locked(self, label: str) -> tuple[str | None, list[str]]:
+        # Git's index.lock protects individual commands, not add/diff/commit as
+        # one transaction. All conversations share this service in AgentLoop.
         if not await self._ensure_init():
             return None, []
         try:

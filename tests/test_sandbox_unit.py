@@ -6,6 +6,7 @@ All tests run without boxlite installed and without KVM/Hypervisor access.
 from __future__ import annotations
 
 import asyncio
+import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -127,9 +128,9 @@ class TestSandboxConfigValidators:
         with pytest.raises(ValueError):
             SandboxConfig(extra_volumes=[["/host", "/vm"]])
 
-    def test_extra_volumes_valid(self):
-        c = SandboxConfig(extra_volumes=[["/data", "/data", "ro"]])
-        assert c.extra_volumes == [["/data", "/data", "ro"]]
+    def test_extra_volumes_valid(self, tmp_path):
+        c = SandboxConfig(extra_volumes=[[str(tmp_path), "/data", "ro"]])
+        assert c.extra_volumes == [[str(tmp_path), "/data", "ro"]]
 
     def test_extra_config_key_rejected(self):
         with pytest.raises(Exception):
@@ -226,14 +227,18 @@ class TestDirectExecutor:
 
     async def test_exec_env(self):
         e = DirectExecutor()
-        result = await e.exec("echo $MY_VAR", env={"MY_VAR": "sandwich"})
+        result = await e.exec(
+            f"\"{sys.executable}\" -c \"import os; print(os.environ.get('MY_VAR', ''))\"", env={"MY_VAR": "sandwich"}
+        )
         assert "sandwich" in result.stdout
 
     async def test_host_env_not_inherited(self, monkeypatch):
         """A sensitive host env var must not leak to executed commands."""
         monkeypatch.setenv("CODEFLOW_TEST_SECRET", "leak-me")
         e = DirectExecutor()
-        result = await e.exec("echo secret=[$CODEFLOW_TEST_SECRET]")
+        result = await e.exec(
+            f"\"{sys.executable}\" -c \"import os; print('secret=[' + os.environ.get('CODEFLOW_TEST_SECRET', '') + ']')\""
+        )
         assert "leak-me" not in result.stdout
         assert "secret=[]" in result.stdout
 

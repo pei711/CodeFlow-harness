@@ -1,0 +1,28 @@
+{
+  "name": "pi-codeflow-ts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript CodeFlow runtime port hosted on Pi Coding Agent",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "engines": { "node": ">=22.19.0" },
+  "scripts": {
+    "start": "tsx src/cli.ts",
+    "test": "node --experimental-strip-types --test",
+    "type-check": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@earendil-works/pi-agent-core": "1.4.0",
+    "@earendil-works/pi-coding-agent": "1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
