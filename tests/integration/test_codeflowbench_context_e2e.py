@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import replace
 from pathlib import Path
 
 from benchmarks.codeflowbench.budget import (
@@ -75,7 +76,7 @@ async def test_fifo_and_curator_factories_share_phase_a_and_swap_phase_b(
         "builder": builder,
         "provider": provider,
         "model": "scripted/context",
-        "context_window_tokens": 2_000,
+        "context_window_tokens": 1_000,
         "get_tool_definitions": lambda: [],
     }
 
@@ -253,6 +254,7 @@ async def test_runtime_context_runner_excludes_plugin_tools_and_uses_sealed_veri
     config = Config()
     config.agents.defaults.model = provider.get_default_model()
     codeflow_config = CodeFlowConfig(base=config)
+    codeflow_config.context.fast_path_threshold = 0.10
     runner = RuntimeContextTrialRunner(
         config=config,
         codeflow_config=codeflow_config,
@@ -316,11 +318,13 @@ async def test_runtime_context_runner_counts_only_dispatched_provider_calls(
     provider = _BudgetFallbackArtifactProvider(task)
     config = Config()
     config.agents.defaults.model = provider.get_default_model()
+    codeflow_config = CodeFlowConfig(base=config)
+    codeflow_config.context.fast_path_threshold = 0.10
     pack = ContextPack(
         ContextTrack.CALIBRATION,
         runner=RuntimeContextTrialRunner(
             config=config,
-            codeflow_config=CodeFlowConfig(base=config),
+            codeflow_config=codeflow_config,
             provider=provider,
         ),
     )
@@ -369,6 +373,7 @@ async def test_runtime_context_runner_classifies_dispatched_cancelled_usage_for_
     config.agents.defaults.model = provider.get_default_model()
     codeflow_config = CodeFlowConfig(base=config)
     codeflow_config.context.curator_timeout_seconds = 0.01
+    codeflow_config.context.fast_path_threshold = 0.10
     pack = ContextPack(
         ContextTrack.CALIBRATION,
         runner=RuntimeContextTrialRunner(
@@ -414,19 +419,25 @@ async def test_runtime_context_runner_classifies_dispatched_cancelled_usage_for_
 async def test_runtime_context_variants_exercise_distinct_history_paths(
     tmp_path: Path,
 ) -> None:
-    task = load_context_tasks(ContextTrack.CALIBRATION)[0]
+    # The short fixture can fit the 2,400-token window with local tokenizers.
+    # Explicitly exceed it so this test actually exercises FIFO eviction.
+    task = replace(load_context_tasks(ContextTrack.CALIBRATION)[0], message_count=80)
     retained: dict[str, bool] = {}
 
     for variant_index in (0, 1):
         provider = _ArtifactProvider(task)
         config = Config()
         config.agents.defaults.model = provider.get_default_model()
+        codeflow_config = CodeFlowConfig(base=config)
+        codeflow_config.context.fast_path_threshold = 0.10
         pack = ContextPack(
             ContextTrack.CALIBRATION,
+            tasks=(task,),
             runner=RuntimeContextTrialRunner(
                 config=config,
-                codeflow_config=CodeFlowConfig(base=config),
+                codeflow_config=codeflow_config,
                 provider=provider,
+                context_window_tokens=2_400,
             ),
         )
         definition = pack.definition()

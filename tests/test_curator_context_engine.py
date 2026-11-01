@@ -18,6 +18,21 @@ from codeflow.spine.message import ChatType, Media, Source
 from codeflow.spine.turn import Origin, TurnRequest
 
 
+def _curator_test_factory(**kwargs):
+    """Exercise the optional Curator component explicitly; engine= is deprecated."""
+    tools = kwargs["get_tool_definitions"]
+    curator = CuratorSegmentBuilder(
+        workspace=kwargs["workspace"],
+        config=kwargs["config"],
+        provider=kwargs["provider"],
+        model=kwargs["model"],
+        context_window_tokens=kwargs["context_window_tokens"],
+        get_tool_definitions=tools,
+        memory_enabled=kwargs.get("backend") is not None,
+    )
+    return ContextAssembler([curator], tools)
+
+
 class CuratorScriptProvider(LLMProvider):
     def __init__(self, *, curator_mode: str = "slow"):
         super().__init__(api_key="test")
@@ -225,6 +240,7 @@ async def test_curator_slow_path_archives_and_writes_trace(tmp_path: Path):
     loop = AgentLoop(
         provider=provider,
         workspace=tmp_path,
+        context_engine_factory=_curator_test_factory,
         context_config=ContextConfig(engine="curator", fast_path_threshold=0.0),
     )
 
@@ -256,6 +272,7 @@ async def test_curator_fallback_when_internal_agent_does_not_finish(tmp_path: Pa
     loop = AgentLoop(
         provider=provider,
         workspace=tmp_path,
+        context_engine_factory=_curator_test_factory,
         context_config=ContextConfig(engine="curator", fast_path_threshold=0.0),
     )
 
@@ -279,6 +296,7 @@ async def test_curator_timeout_records_distinct_fallback_reason(tmp_path: Path):
     loop = AgentLoop(
         provider=HangingCuratorProvider(),
         workspace=tmp_path,
+        context_engine_factory=_curator_test_factory,
         context_config=ContextConfig(
             engine="curator",
             fast_path_threshold=0.0,
@@ -302,6 +320,7 @@ async def test_curator_provider_error_records_category(tmp_path: Path):
     loop = AgentLoop(
         provider=CuratorScriptProvider(curator_mode="error"),
         workspace=tmp_path,
+        context_engine_factory=_curator_test_factory,
         context_config=ContextConfig(engine="curator", fast_path_threshold=0.0),
     )
 
@@ -365,6 +384,7 @@ async def test_process_message_records_main_and_curator_trajectories(tmp_path: P
     loop = AgentLoop(
         provider=provider,
         workspace=tmp_path,
+        context_engine_factory=_curator_test_factory,
         context_config=ContextConfig(engine="curator", fast_path_threshold=0.0),
     )
     session = loop.sessions.get_or_create("cli:trace-test")

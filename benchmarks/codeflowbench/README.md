@@ -7,6 +7,21 @@ public `codeflow bench` command.
 
 ## Entry points
 
+### Repository Coding Tasks and Trajectory Evaluation
+
+The initial coding track lives under `benchmarks/codeflowbench/coding/` and
+reuses CodeFlow's single-message CLI and raw tracing output. Its task format
+pins a Git commit, runs fail-to-pass and pass-to-pass checks around the Agent,
+records run artifacts in an isolated clone, and compares two version directories by task
+and repetition. It also scores tool reliability, repeated identical reads,
+token usage, verification activity, and any explicit compaction/resume evidence.
+
+This is a runner, not yet a curated 10–20 issue dataset. The current trace
+schema does not reliably report verifier outcome, compaction, or successful
+resume as structured events, so those dimensions are unknown unless explicit
+evidence is present. Read `coding/README.md` for the JSON task schema, commands,
+and the security boundary before creating tasks or running them.
+
 Run the credential-free gate first:
 
 ```bash

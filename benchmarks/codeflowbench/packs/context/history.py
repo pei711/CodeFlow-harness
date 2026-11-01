@@ -16,6 +16,7 @@ from codeflow.context_engine.segments import (
     MemorySegmentBuilder,
     SkillsSegmentBuilder,
 )
+from codeflow.context_engine.segments.codeflow_history import CodeFlowHistorySegmentBuilder
 from codeflow.context_engine.segments.curator import CuratorSegmentBuilder
 from codeflow.providers.base import LLMProvider
 
@@ -109,6 +110,8 @@ class FullHistoryManager:
 
 
 def context_engine_factory_for(history_manager: str) -> "ContextEngineFactory":
+    if history_manager == "codeflow_history":
+        return build_codeflow_history_context_engine
     if history_manager == "curator":
         return build_benchmark_curator_context_engine
     if history_manager == "fifo_tail":
@@ -116,6 +119,46 @@ def context_engine_factory_for(history_manager: str) -> "ContextEngineFactory":
     if history_manager == "full_history":
         return build_full_history_context_engine
     raise ValueError(f"unsupported Context history manager: {history_manager}")
+
+
+def build_codeflow_history_context_engine(
+    *,
+    workspace: Path,
+    config: "ContextConfig",
+    builder: ContextBuilder,
+    provider: LLMProvider,
+    model: str,
+    context_window_tokens: int,
+    get_tool_definitions: Callable[[], list[dict]],
+    now_fn: Callable[[], datetime] | None = None,
+    backend: "MemoryBackend | None" = None,
+    memory_config: "MemoryConfig | None" = None,
+    skill_forge_router_config: "SkillForgeRouterConfig | None" = None,
+    skill_forge_config: "SkillForgeConfig | None" = None,
+) -> ContextEngine:
+    """Build the shipping CodeFlow history policy for pressure-threshold experiments."""
+    return _build_benchmark_context_engine(
+        workspace=workspace,
+        builder=builder,
+        provider=provider,
+        model=model,
+        context_window_tokens=context_window_tokens,
+        get_tool_definitions=get_tool_definitions,
+        now_fn=now_fn,
+        backend=backend,
+        memory_config=memory_config,
+        skill_forge_router_config=skill_forge_router_config,
+        skill_forge_config=skill_forge_config,
+        history_manager=CodeFlowHistorySegmentBuilder(
+            state_root=builder.state,
+            config=config,
+            provider=provider,
+            model=model,
+            context_window_tokens=context_window_tokens,
+            get_tool_definitions=get_tool_definitions,
+        ),
+        context_budget_ratio=config.context_budget_ratio,
+    )
 
 
 def build_benchmark_curator_context_engine(
@@ -156,6 +199,7 @@ def build_benchmark_curator_context_engine(
             memory_enabled=backend is not None,
             max_steps=CONTEXT_BENCHMARK_CURATOR_MAX_STEPS,
         ),
+        context_budget_ratio=config.context_budget_ratio,
     )
 
 
@@ -174,7 +218,6 @@ def build_fifo_context_engine(
     skill_forge_router_config: "SkillForgeRouterConfig | None" = None,
     skill_forge_config: "SkillForgeConfig | None" = None,
 ) -> ContextEngine:
-    del config
     return _build_benchmark_context_engine(
         workspace=workspace,
         builder=builder,
@@ -193,6 +236,7 @@ def build_fifo_context_engine(
             get_tool_definitions=get_tool_definitions,
             context_window_tokens=context_window_tokens,
         ),
+        context_budget_ratio=config.context_budget_ratio,
     )
 
 
@@ -211,7 +255,6 @@ def build_full_history_context_engine(
     skill_forge_router_config: "SkillForgeRouterConfig | None" = None,
     skill_forge_config: "SkillForgeConfig | None" = None,
 ) -> ContextEngine:
-    del config
     return _build_benchmark_context_engine(
         workspace=workspace,
         builder=builder,
@@ -225,6 +268,7 @@ def build_full_history_context_engine(
         skill_forge_router_config=skill_forge_router_config,
         skill_forge_config=skill_forge_config,
         history_manager=FullHistoryManager(),
+        context_budget_ratio=config.context_budget_ratio,
     )
 
 
@@ -242,6 +286,7 @@ def _build_benchmark_context_engine(
     skill_forge_router_config: "SkillForgeRouterConfig | None",
     skill_forge_config: "SkillForgeConfig | None",
     history_manager: Any,
+    context_budget_ratio: float,
 ) -> ContextEngine:
     from codeflow.config.codeflow import MemoryConfig, SkillForgeRouterConfig
 
@@ -274,7 +319,12 @@ def _build_benchmark_context_engine(
         ),
         history_manager,
     ]
-    return ContextAssembler(builders, get_tool_definitions, now_fn=now_fn)
+    return ContextAssembler(
+        builders,
+        get_tool_definitions,
+        now_fn=now_fn,
+        context_budget_ratio=context_budget_ratio,
+    )
 
 
 __all__ = [
@@ -282,6 +332,7 @@ __all__ = [
     "FifoHistoryManager",
     "FullHistoryManager",
     "build_benchmark_curator_context_engine",
+    "build_codeflow_history_context_engine",
     "build_fifo_context_engine",
     "build_full_history_context_engine",
     "context_engine_factory_for",

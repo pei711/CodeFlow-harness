@@ -48,12 +48,16 @@ class ContextAssembler(ContextEngine):
         builders: list[SegmentBuilder],
         get_tool_definitions: Callable[[], list[dict[str, Any]]],
         now_fn: Callable[[], datetime] | None = None,
+        context_budget_ratio: float = 0.80,
     ) -> None:
+        if not 0 < context_budget_ratio <= 1:
+            raise ValueError("context_budget_ratio must be in (0, 1]")
         self._builders = sorted(builders, key=lambda b: b.order)
         self._phase_a = [b for b in self._builders if not b.needs_prefix]
         self._phase_b = [b for b in self._builders if b.needs_prefix]
         self.get_tool_definitions = get_tool_definitions
         self._now_fn = now_fn or datetime.now
+        self._context_budget_ratio = context_budget_ratio
 
     @property
     def name(self) -> str:
@@ -79,24 +83,7 @@ class ContextAssembler(ContextEngine):
         *,
         turn: "TurnContext",
     ) -> AssembledContext:
-        effective_context_tokens = max(
-            1,
-            int(budget.context_length) - int(budget.reserved_output) - int(budget.reserved_tools),
-        )
-        # Keep CodeFlow's conservative half-window working set and section
-        # priorities while still applying Harness's provider-aware final gate.
-        context_budget_tokens = max(1, int(effective_context_tokens * 0.50))
-        section_weights = {
-            "prefix": 0.20,
-            "memory": 0.13,
-            "skills": 0.07,
-            "relevant_memory": 0.10,
-            "history": 0.50,
-        }
-        section_budgets = {
-            name: max(1, int(context_budget_tokens * weight))
-            for name, weight in section_weights.items()
-        }
+        context_budget_tokens, section_budgets = self._section_budgets(budget)
         adjusted_budget = replace(
             budget,
             available_history=min(budget.available_history, section_budgets["history"]),
@@ -175,6 +162,26 @@ class ContextAssembler(ContextEngine):
                 "context_clipped_chars": clipped_sections,
             },
         )
+
+    def _section_budgets(self, budget: TokenBudget) -> tuple[int, dict[str, int]]:
+        effective_context_tokens = max(
+            1,
+            int(budget.context_length) - int(budget.reserved_output) - int(budget.reserved_tools),
+        )
+        # Keep CodeFlow's 80% effective-window working set and section
+        # priorities while still applying Harness's provider-aware final gate.
+        context_budget_tokens = max(1, int(effective_context_tokens * self._context_budget_ratio))
+        section_weights = {
+            "prefix": 0.20,
+            "memory": 0.13,
+            "skills": 0.07,
+            "relevant_memory": 0.10,
+            "history": 0.50,
+        }
+        section_budgets = {
+            name: max(1, int(context_budget_tokens * weight)) for name, weight in section_weights.items()
+        }
+        return context_budget_tokens, section_budgets
 
     @staticmethod
     def _section_for_builder(name: str) -> str:

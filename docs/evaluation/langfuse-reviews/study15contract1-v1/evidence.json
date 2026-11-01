@@ -1,0 +1,1933 @@
+{
+  "schema": "context-evidence-v1",
+  "versions": {
+    "source_digest": "46eb3a8c722e62abbcb08e3241e21ff2886ea2042945dcc9ce96a055d72729a7",
+    "config_digest": "009575c198ba2ffc1a043be097ae6322d905c0ff6eb668831faa23c2499777b2",
+    "prompt_digest": "a9f25fe7ef7baee988a9ce6929b25268f364951f4e538f92eefea6f8f13eff12",
+    "dataset_digest": "d8794b4dfb2ae606842c2c494f89b08657a63b49ebfe0217717fae6fee16d167",
+    "verifier_digest": "0aa337c3cbf85c50f2928eb992cf7d11cbd771d40be3f0dc25853e767283666b",
+    "diagnostic_version": "context-evidence-v1",
+    "runtime_config_complete": false,
+    "experiment_version": "2564978d7769a41a2032d9b9c118e82b00c0126e8379306a943b4dd12d99b558"
+  },
+  "trials": [
+    {
+      "pair_id": "compression_degradation-1",
+      "arm": "baseline",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-f83cc295246c"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5397,
+        "cache_read_tokens": 10368,
+        "cache_write_tokens": 0,
+        "output_tokens": 530,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0009330104,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.01766625,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4408.95,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-1",
+      "arm": "governed",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-92f81543582e"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 2738,
+        "cache_read_tokens": 5248,
+        "cache_write_tokens": 0,
+        "output_tokens": 352,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0004965744,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.009124500000000002,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4257.88,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-2",
+      "arm": "baseline",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-70255865b453"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5297,
+        "cache_read_tokens": 10624,
+        "cache_write_tokens": 0,
+        "output_tokens": 854,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0010104472,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.01851045,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 6331.84,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-2",
+      "arm": "governed",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-1123e503ceb6"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 2691,
+        "cache_read_tokens": 5248,
+        "cache_write_tokens": 0,
+        "output_tokens": 509,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0005339544,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.009404850000000001,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4287.44,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-3",
+      "arm": "baseline",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-2a32f8485f57"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5345,
+        "cache_read_tokens": 10112,
+        "cache_write_tokens": 0,
+        "output_tokens": 305,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0008620136000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.016870350000000003,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 3236.21,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-3",
+      "arm": "governed",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-54c9a7f8ef12"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 2844,
+        "cache_read_tokens": 5120,
+        "cache_write_tokens": 0,
+        "output_tokens": 447,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0005376560000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.0093009,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4562.13,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-4",
+      "arm": "baseline",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-5c4b589ea3f5"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5386,
+        "cache_read_tokens": 10112,
+        "cache_write_tokens": 0,
+        "output_tokens": 343,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0008783936000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.016993200000000003,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 3870.75,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-4",
+      "arm": "governed",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-b3b7f3c7af29"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 2797,
+        "cache_read_tokens": 5248,
+        "cache_write_tokens": 0,
+        "output_tokens": 521,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0005521544,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.00954135,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4625.36,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-5",
+      "arm": "baseline",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-43e558cae0c8"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5434,
+        "cache_read_tokens": 10240,
+        "cache_write_tokens": 0,
+        "output_tokens": 483,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0009246720000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.017472,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4236.94,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "compression_degradation-5",
+      "arm": "governed",
+      "scenario": "compression_degradation",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-3bec4798f0f1"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 2812,
+        "cache_read_tokens": 5120,
+        "cache_write_tokens": 0,
+        "output_tokens": 340,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.000503216,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.009042600000000001,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 3829.68,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-1",
+      "arm": "baseline",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-162515c32c4d"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5368,
+        "cache_read_tokens": 10240,
+        "cache_write_tokens": 0,
+        "output_tokens": 457,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0009081520000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.017348099999999998,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4402.62,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-1",
+      "arm": "governed",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-d6b498fff72c"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5069,
+        "cache_read_tokens": 5120,
+        "cache_write_tokens": 0,
+        "output_tokens": 2405,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.001397396,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.01574895,
+        "ledger_request_attempts": 4,
+        "ledger_terminal_attempts": 4,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 2212,
+        "summary_output_tokens": 2048,
+        "summary_latency_ms": 12302.548999999999,
+        "trial_wall_latency_ms": 16176.8,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-2",
+      "arm": "baseline",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-71ce0b719170"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5374,
+        "cache_read_tokens": 10752,
+        "cache_write_tokens": 0,
+        "output_tokens": 892,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0010322256,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.018805500000000003,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 6426.75,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-2",
+      "arm": "governed",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-941feaf9f3f4"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4977,
+        "cache_read_tokens": 5248,
+        "cache_write_tokens": 0,
+        "output_tokens": 2579,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0014335944000000002,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.01615215,
+        "ledger_request_attempts": 4,
+        "ledger_terminal_attempts": 4,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 2210,
+        "summary_output_tokens": 2048,
+        "summary_latency_ms": 13057.301500004542,
+        "trial_wall_latency_ms": 17433.05,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-3",
+      "arm": "baseline",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-683a8a13012c"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5349,
+        "cache_read_tokens": 10368,
+        "cache_write_tokens": 0,
+        "output_tokens": 464,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0009078104,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.017477250000000003,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 5347.67,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-3",
+      "arm": "governed",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "failed",
+      "status": "task_failed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-0958c2a02612"
+      ],
+      "diagnostics": {
+        "failure_category": "artifact_mismatch",
+        "failure_categories": [
+          "artifact_mismatch",
+          "latest_decision_applied_failed"
+        ],
+        "findings": [
+          "artifact_mismatch"
+        ],
+        "verifier_findings": [
+          "artifact_mismatch"
+        ],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": false,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": false,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4893,
+        "cache_read_tokens": 4992,
+        "cache_write_tokens": 0,
+        "output_tokens": 2262,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0013323576000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.015129450000000001,
+        "ledger_request_attempts": 4,
+        "ledger_terminal_attempts": 4,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 2224,
+        "summary_output_tokens": 1742,
+        "summary_latency_ms": 10155.311299997265,
+        "trial_wall_latency_ms": 14688.45,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-4",
+      "arm": "baseline",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-7d0efb7b89cf"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5316,
+        "cache_read_tokens": 10496,
+        "cache_write_tokens": 0,
+        "output_tokens": 559,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0009301488000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.0177765,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4141.45,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-4",
+      "arm": "governed",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-da94d7b8069f"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5070,
+        "cache_read_tokens": 5376,
+        "cache_write_tokens": 0,
+        "output_tokens": 2630,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0014612528000000002,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.0164913,
+        "ledger_request_attempts": 4,
+        "ledger_terminal_attempts": 4,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 2263,
+        "summary_output_tokens": 2048,
+        "summary_latency_ms": 12730.443600004946,
+        "trial_wall_latency_ms": 16938.52,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-5",
+      "arm": "baseline",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-841ae881b5fc"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5328,
+        "cache_read_tokens": 10240,
+        "cache_write_tokens": 0,
+        "output_tokens": 503,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.000915432,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.017402700000000004,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4613.02,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "cross_turn_dependency-5",
+      "arm": "governed",
+      "scenario": "cross_turn_dependency",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-b37316fc5751"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 5035,
+        "cache_read_tokens": 4992,
+        "cache_write_tokens": 0,
+        "output_tokens": 2209,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0013373976,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.015167250000000002,
+        "ledger_request_attempts": 4,
+        "ledger_terminal_attempts": 4,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 2268,
+        "summary_output_tokens": 1763,
+        "summary_latency_ms": 10673.418799997307,
+        "trial_wall_latency_ms": 14772.08,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-1",
+      "arm": "baseline",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-6cfd28494d40"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4389,
+        "cache_read_tokens": 8448,
+        "cache_write_tokens": 0,
+        "output_tokens": 435,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0007599144,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.01439235,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4795.13,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-1",
+      "arm": "governed",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-5d5d0d9b0a8a"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4408,
+        "cache_read_tokens": 8448,
+        "cache_write_tokens": 0,
+        "output_tokens": 705,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0008381744,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.014979300000000003,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 5076.9,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-2",
+      "arm": "baseline",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-6fd4c3887b9a"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4338,
+        "cache_read_tokens": 8320,
+        "cache_write_tokens": 0,
+        "output_tokens": 377,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0007361760000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.0140826,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 3851.69,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-2",
+      "arm": "governed",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-f963ab0da18c"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4263,
+        "cache_read_tokens": 8192,
+        "cache_write_tokens": 0,
+        "output_tokens": 499,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0007594775999999999,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.01412565,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4004.09,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-3",
+      "arm": "baseline",
+      "scenario": "long_session",
+      "verifier_state": "failed",
+      "status": "task_failed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-ae302c1e5c12"
+      ],
+      "diagnostics": {
+        "failure_category": "artifact_mismatch",
+        "failure_categories": [
+          "artifact_mismatch",
+          "latest_decision_applied_failed"
+        ],
+        "findings": [
+          "artifact_mismatch"
+        ],
+        "verifier_findings": [
+          "artifact_mismatch"
+        ],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": false,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": false,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4401,
+        "cache_read_tokens": 8448,
+        "cache_write_tokens": 0,
+        "output_tokens": 463,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0007694344000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.014463750000000001,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 3781.14,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-3",
+      "arm": "governed",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-96adb81b9bed"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4282,
+        "cache_read_tokens": 8064,
+        "cache_write_tokens": 0,
+        "output_tokens": 423,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0007404992,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.013851600000000002,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 3628.12,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-4",
+      "arm": "baseline",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-95d42444392b"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4306,
+        "cache_read_tokens": 8704,
+        "cache_write_tokens": 0,
+        "output_tokens": 671,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0008150912,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.015069600000000002,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4806.87,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-4",
+      "arm": "governed",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-106074f12ce3"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4332,
+        "cache_read_tokens": 8064,
+        "cache_write_tokens": 0,
+        "output_tokens": 500,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0007690592000000001,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.014065800000000003,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4416.75,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-5",
+      "arm": "baseline",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-b5af671027cc"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4331,
+        "cache_read_tokens": 8320,
+        "cache_write_tokens": 0,
+        "output_tokens": 442,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.000753396,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.014211750000000002,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 4227.34,
+        "human_wait_ms": null
+      }
+    },
+    {
+      "pair_id": "long_session-5",
+      "arm": "governed",
+      "scenario": "long_session",
+      "verifier_state": "passed",
+      "status": "passed",
+      "artifact_refs": [
+        ".cf/c-study15contract1/t-0d6f3043b72d"
+      ],
+      "diagnostics": {
+        "failure_category": "none",
+        "failure_categories": [],
+        "findings": [],
+        "verifier_findings": [],
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "artifact_valid_json": true,
+        "forbidden_paths_clean": true,
+        "evidence_chain": {
+          "original_history": "manifest.tasks.history",
+          "summary_retention": "unknown",
+          "final_context_retention": "unknown",
+          "artifact_checks": {
+            "early_constraint_retained": true,
+            "active_constraint_applied": true,
+            "latest_decision_applied": true,
+            "artifact_valid_json": true,
+            "forbidden_paths_clean": true
+          }
+        },
+        "root_cause": "unknown",
+        "next_check": "Compare original history, saved summary, final model input and artifact; change one factor per experiment."
+      },
+      "accounting": {
+        "input_tokens": 4284,
+        "cache_read_tokens": 7936,
+        "cache_write_tokens": 0,
+        "output_tokens": 284,
+        "usage_reconciled": true,
+        "recorded_runtime_estimate_usd": 0.0007015007999999999,
+        "main_agent_estimate_usd": null,
+        "summary_estimate_usd": null,
+        "cost_role_split": "unknown: historical model spans do not record main/summary roles",
+        "cost_basis": "recorded_runtime_estimate_not_invoice",
+        "pricing_version": "unknown",
+        "actual_billed_cost_usd": null,
+        "ledger_budget_charge_cny": 0.0134274,
+        "ledger_request_attempts": 3,
+        "ledger_terminal_attempts": 3,
+        "ledger_failed_attempts": 0,
+        "ledger_usage_reconciled": true,
+        "summary_input_tokens": 0,
+        "summary_output_tokens": 0,
+        "summary_latency_ms": 0,
+        "trial_wall_latency_ms": 3416.72,
+        "human_wait_ms": null
+      }
+    }
+  ],
+  "comparisons": {
+    "overall": {
+      "baseline": {
+        "n": 15,
+        "passed": 14,
+        "failure_counts": {
+          "artifact_mismatch": 1,
+          "latest_decision_applied_failed": 1
+        },
+        "input_tokens": 75359,
+        "cache_read_tokens": 145792,
+        "cache_write_tokens": 0,
+        "output_tokens": 7778,
+        "recorded_runtime_estimate_usd": 0.0131363176,
+        "estimate_usd_per_verified_task_including_failures": 0.0009383084,
+        "ledger_budget_charge_cny": 0.24854235000000002,
+        "mean_wall_latency_ms": 4565.224666666667,
+        "total_summary_latency_ms": 0
+      },
+      "governed": {
+        "n": 15,
+        "passed": 14,
+        "failure_counts": {
+          "artifact_mismatch": 1,
+          "latest_decision_applied_failed": 1
+        },
+        "input_tokens": 60495,
+        "cache_read_tokens": 92416,
+        "cache_write_tokens": 0,
+        "output_tokens": 16665,
+        "recorded_runtime_estimate_usd": 0.0133942648,
+        "estimate_usd_per_verified_task_including_failures": 0.0009567331999999999,
+        "ledger_budget_charge_cny": 0.19555305,
+        "mean_wall_latency_ms": 8140.931333333333,
+        "total_summary_latency_ms": 58919.02420000406
+      }
+    },
+    "compression_degradation": {
+      "baseline": {
+        "n": 5,
+        "passed": 5,
+        "failure_counts": {},
+        "input_tokens": 26859,
+        "cache_read_tokens": 51456,
+        "cache_write_tokens": 0,
+        "output_tokens": 2515,
+        "recorded_runtime_estimate_usd": 0.0046085368,
+        "estimate_usd_per_verified_task_including_failures": 0.00092170736,
+        "ledger_budget_charge_cny": 0.08751225000000001,
+        "mean_wall_latency_ms": 4416.938,
+        "total_summary_latency_ms": 0
+      },
+      "governed": {
+        "n": 5,
+        "passed": 5,
+        "failure_counts": {},
+        "input_tokens": 13882,
+        "cache_read_tokens": 25984,
+        "cache_write_tokens": 0,
+        "output_tokens": 2169,
+        "recorded_runtime_estimate_usd": 0.0026235552,
+        "estimate_usd_per_verified_task_including_failures": 0.00052471104,
+        "ledger_budget_charge_cny": 0.0464142,
+        "mean_wall_latency_ms": 4312.498,
+        "total_summary_latency_ms": 0
+      }
+    },
+    "cross_turn_dependency": {
+      "baseline": {
+        "n": 5,
+        "passed": 5,
+        "failure_counts": {},
+        "input_tokens": 26735,
+        "cache_read_tokens": 52096,
+        "cache_write_tokens": 0,
+        "output_tokens": 2875,
+        "recorded_runtime_estimate_usd": 0.0046937688,
+        "estimate_usd_per_verified_task_including_failures": 0.0009387537600000001,
+        "ledger_budget_charge_cny": 0.08881005,
+        "mean_wall_latency_ms": 4986.302,
+        "total_summary_latency_ms": 0
+      },
+      "governed": {
+        "n": 5,
+        "passed": 4,
+        "failure_counts": {
+          "artifact_mismatch": 1,
+          "latest_decision_applied_failed": 1
+        },
+        "input_tokens": 25044,
+        "cache_read_tokens": 25728,
+        "cache_write_tokens": 0,
+        "output_tokens": 12085,
+        "recorded_runtime_estimate_usd": 0.006961998400000001,
+        "estimate_usd_per_verified_task_including_failures": 0.0017404996000000002,
+        "ledger_budget_charge_cny": 0.07868910000000001,
+        "mean_wall_latency_ms": 16001.78,
+        "total_summary_latency_ms": 58919.02420000406
+      }
+    },
+    "long_session": {
+      "baseline": {
+        "n": 5,
+        "passed": 4,
+        "failure_counts": {
+          "artifact_mismatch": 1,
+          "latest_decision_applied_failed": 1
+        },
+        "input_tokens": 21765,
+        "cache_read_tokens": 42240,
+        "cache_write_tokens": 0,
+        "output_tokens": 2388,
+        "recorded_runtime_estimate_usd": 0.0038340120000000004,
+        "estimate_usd_per_verified_task_including_failures": 0.0009585030000000001,
+        "ledger_budget_charge_cny": 0.07222005000000001,
+        "mean_wall_latency_ms": 4292.434,
+        "total_summary_latency_ms": 0
+      },
+      "governed": {
+        "n": 5,
+        "passed": 5,
+        "failure_counts": {},
+        "input_tokens": 21569,
+        "cache_read_tokens": 40704,
+        "cache_write_tokens": 0,
+        "output_tokens": 2411,
+        "recorded_runtime_estimate_usd": 0.0038087112,
+        "estimate_usd_per_verified_task_including_failures": 0.00076174224,
+        "ledger_budget_charge_cny": 0.07044975,
+        "mean_wall_latency_ms": 4108.516,
+        "total_summary_latency_ms": 0
+      }
+    }
+  }
+}

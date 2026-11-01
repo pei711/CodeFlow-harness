@@ -175,6 +175,13 @@ ignore = ["E501"]
 "scripts/check_commit_messages.py" = ["S607"]
 "scripts/check_large_files.py" = ["S607"]
 
+# Checkout-only study launchers bootstrap imports and invoke the installed Git CLI.
+"scripts/context_langfuse_study.py" = ["E402", "S607"]
+"scripts/langfuse_codeflow.py" = ["S607"]
+"benchmarks/codeflowbench/coding/runner.py" = ["S607"]
+# Offline SDK fixtures use deliberately invalid keys; no real credential is embedded.
+"scripts/test_langfuse_codeflow.py" = ["S106"]
+
 # evolver 与 appworld 基准按设计使用 Git/Bash 子进程驱动（S607）；K 是 SOP 领域中
 # 每任务试验次数的术语（N803/N806）；*_PASS/*_TOKEN 常量是结果标签和信标标记，
 # 不是凭据（S105）；断言与上方转换或保留批次一起跟踪（S101）。

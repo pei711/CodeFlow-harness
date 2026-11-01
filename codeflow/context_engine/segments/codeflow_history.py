@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 from pathlib import Path
@@ -10,10 +11,10 @@ from typing import Any, Callable
 from codeflow.config.codeflow import ContextConfig
 from codeflow.context_engine.base import AssemblyContext, Segment
 from codeflow.context_engine.history_trimmer import HistoryTrimmer
+from codeflow.security.trust import wrap_untrusted
 from codeflow.utils.atomic_io import atomic_replace, locked_read
 from codeflow.utils.helpers import ensure_dir, estimate_message_tokens, safe_filename
 from codeflow.utils.persisted_payload import sanitize_persisted_text
-from codeflow.security.trust import wrap_untrusted
 
 
 class CodeFlowHistorySegmentBuilder:
@@ -45,6 +46,7 @@ class CodeFlowHistorySegmentBuilder:
         self.context_window_tokens = context_window_tokens
         self.get_tool_definitions = get_tool_definitions
         self.root = ensure_dir(state_root / "context_memory" / "compaction")
+        self._summary_failure_reason: str | None = None
 
     @property
     def _trimmer(self) -> HistoryTrimmer:
@@ -82,15 +84,26 @@ class CodeFlowHistorySegmentBuilder:
         history_tokens = sum(estimate_message_tokens(message) for message in history)
         budget = max(1, int(ctx.budget.available_history))
         pressure = history_tokens / budget
-        tier = "tier3_summary" if pressure >= 0.95 else "tier2_prune" if pressure >= 0.80 else "tier1_snip" if pressure >= 0.60 else "tier0_observe"
+        compact_threshold = self.config.structured_compact_threshold
+        if pressure >= compact_threshold:
+            tier = "tier3_summary"
+        elif pressure >= 0.80:
+            tier = "tier2_prune"
+        elif pressure >= 0.60:
+            tier = "tier1_snip"
+        else:
+            tier = "tier0_observe"
 
         state = self._load_state(ctx.session_key)
         boundary = int(state.get("source_message_count", 0) or 0)
-        if boundary > len(history):
+        if boundary > len(history) or (
+            boundary and state.get("source_digest") != self._history_digest(history[:boundary])
+        ):
             state = {}
             boundary = 0
         summary = str(state.get("summary", ""))
         summary_mode = str(state.get("mode", "none"))
+        self._summary_failure_reason = state.get("failure_reason")
         compacted = False
 
         if tier == "tier3_summary" and len(history) >= 8:
@@ -105,6 +118,8 @@ class CodeFlowHistorySegmentBuilder:
                     "summary": summary,
                     "source_message_count": cut,
                     "mode": summary_mode,
+                    "source_digest": self._history_digest(history[:cut]),
+                    "failure_reason": self._summary_failure_reason,
                 }
                 self._save_state(ctx.session_key, state)
                 boundary = cut
@@ -112,11 +127,21 @@ class CodeFlowHistorySegmentBuilder:
 
         # CodeFlow's snip/prune tiers keep the newest work legible before the
         # final token-aware turn trimmer enforces the provider window.
+        # Select anchors from the ORIGINAL append-only history, before applying
+        # any summary boundary or tail pruning. Their original user role is kept;
+        # an untrusted summary must never become the only copy of a constraint.
+        anchor_ids = [i for i, item in enumerate(history) if item.get("role") == "user"][
+            : max(0, self.config.protect_first_n)
+        ]
         visible = history[boundary:]
-        if tier in {"tier1_snip", "tier2_prune"}:
-            visible = self._snip_old_tool_results(visible, keep_recent=6 if tier == "tier1_snip" else 3)
+        visible_ids = list(range(boundary, len(history)))
         if tier == "tier2_prune" and len(visible) > 12:
             visible = self._recent_turn_tail(visible, max_messages=24)
+            visible_ids = visible_ids[-len(visible) :]
+        visible_ids = sorted(set(visible_ids) | set(anchor_ids))
+        visible = [history[i] for i in visible_ids]
+        if tier in {"tier1_snip", "tier2_prune"}:
+            visible = self._snip_old_tool_results(visible, keep_recent=6 if tier == "tier1_snip" else 3)
 
         summary_segment = (
             "# Context Summary\n\n" + wrap_untrusted(summary, source="compacted conversation") if summary else ""
@@ -126,7 +151,7 @@ class CodeFlowHistorySegmentBuilder:
             system += "\n\n---\n\n" + summary_segment
         prefix = type(ctx.prefix)(system, ctx.prefix.user_message, ctx.prefix.tool_defs)
         ids = list(range(len(visible)))
-        protected = {0} if visible and visible[0].get("role") == "user" else set()
+        protected = {i for i, original_id in enumerate(visible_ids) if original_id in anchor_ids}
         priorities = {index: index / max(1, len(visible)) for index in range(len(visible))}
         messages, outcome = self._trimmer.trim(
             session_messages=visible,
@@ -134,7 +159,11 @@ class CodeFlowHistorySegmentBuilder:
             protected_ids=protected,
             priority_scores=priorities,
             reserved_output=ctx.budget.reserved_output,
-            build_messages=lambda selected: [{"role": "system", "content": prefix.system_prefix}, *selected, prefix.user_message],
+            build_messages=lambda selected: [
+                {"role": "system", "content": prefix.system_prefix},
+                *selected,
+                prefix.user_message,
+            ],
         )
         return Segment(
             text=summary_segment,
@@ -149,7 +178,9 @@ class CodeFlowHistorySegmentBuilder:
                 "history_trimmed": outcome.included_ids != ids,
                 "context_compacted": compacted,
                 "summary_mode": summary_mode,
+                "summary_failure_reason": self._summary_failure_reason,
                 "summary_boundary": boundary,
+                "protected_user_message_ids": anchor_ids,
                 "validation_ok": outcome.ok,
                 "validation_source": outcome.source,
             },
@@ -161,10 +192,8 @@ class CodeFlowHistorySegmentBuilder:
         return None
 
     async def _compact(self, events: list[dict[str, Any]], current_request: str, prior_summary: str) -> tuple[str, str]:
-        body = "\n\n".join(
-            f"[{item.get('role', 'message')}] {item.get('content', '')}"[:2400]
-            for item in events
-        )
+        self._summary_failure_reason = None
+        body = "\n\n".join(f"[{item.get('role', 'message')}] {item.get('content', '')}"[:2400] for item in events)
         prompt = (
             "Summarize this coding-agent history for continuation. Preserve exact user constraints, "
             "file paths, decisions, test results, blockers, and next steps. Use concise Markdown. "
@@ -173,23 +202,54 @@ class CodeFlowHistorySegmentBuilder:
             f"Current request:\n{current_request}\n\nHistory:\n{body}"
         )
         try:
-            response = await self.provider.chat_with_retry(
-                messages=[{"role": "user", "content": prompt}],
-                model=self.model,
-                max_tokens=1024,
-                temperature=0.1,
+            response = await asyncio.wait_for(
+                self.provider.chat_with_retry(
+                    messages=[{"role": "user", "content": prompt}],
+                    model=self.model,
+                    max_tokens=self.config.compact_max_output_tokens,
+                    temperature=0.1,
+                ),
+                timeout=self.config.compact_timeout_seconds,
             )
             text = str(getattr(response, "content", "") or "").strip()
-            if text and len(text) <= 6000:
+            finish_reason = getattr(response, "finish_reason", "stop")
+            if finish_reason == "length":
+                self._summary_failure_reason = "output_truncated"
+            elif finish_reason == "error" or getattr(response, "error_classification", None) is not None:
+                self._summary_failure_reason = "provider_error"
+            elif not text:
+                self._summary_failure_reason = "empty_summary"
+            elif len(text) > 6000:
+                self._summary_failure_reason = "summary_too_long"
+            else:
                 return text, "llm"
-        except Exception:
-            pass
-        fallback = self._deterministic_summary(events, current_request, prior_summary)
+        except Exception as exc:
+            self._summary_failure_reason = type(exc).__name__
+        fallback = self._deterministic_summary(
+            events,
+            current_request,
+            prior_summary,
+            protected_user_count=self.config.protect_first_n,
+        )
         return fallback, "deterministic_fallback"
 
     @staticmethod
-    def _deterministic_summary(events: list[dict[str, Any]], request: str, prior: str) -> str:
-        lines = ["## Goal", request[:400] or "-", "## Recent facts"]
+    def _deterministic_summary(
+        events: list[dict[str, Any]],
+        request: str,
+        prior: str,
+        *,
+        protected_user_count: int = 3,
+    ) -> str:
+        lines = ["## Goal", request[:400] or "-"]
+        # Preserve initial user evidence before selecting recent diagnostics.
+        # The full protected messages also remain in the raw history slot.
+        initial_users = [item for item in events if item.get("role") == "user"][: max(0, protected_user_count)]
+        if initial_users:
+            lines.extend(["## Initial user requirements", *[str(item.get("content", "")) for item in initial_users]])
+        if prior.strip():
+            lines.extend(["## Earlier context", prior[:1200]])
+        lines.append("## Recent facts")
         facts = []
         for item in events:
             content = str(item.get("content", "")).strip()
@@ -200,9 +260,11 @@ class CodeFlowHistorySegmentBuilder:
             facts.append(f"- [{item.get('role', 'message')}] {content[:220]}")
         lines.extend(facts[-12:] or ["- No additional facts recorded."])
         lines.extend(["## Next Steps", "- Continue from the latest user request and verify any new changes."])
-        if prior.strip():
-            lines.extend(["## Earlier Context", prior[:1200]])
         return "\n".join(lines)[:5000]
+
+    @staticmethod
+    def _history_digest(history: list[dict[str, Any]]) -> str:
+        return hashlib.sha256(json.dumps(history, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
     @staticmethod
     def _safe_cut(messages: list[dict[str, Any]]) -> int:

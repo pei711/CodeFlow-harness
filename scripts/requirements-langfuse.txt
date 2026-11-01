@@ -1,0 +1,2 @@
+# Install in a separate environment; CodeFlow itself remains SDK-independent.
+langfuse==4.18.0

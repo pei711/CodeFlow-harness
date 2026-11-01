@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import contextlib
 import contextvars
-import fcntl
 import json
 import math
 import os
@@ -13,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, AsyncIterator, Iterator
 
+import portalocker
 import tiktoken
 
 from codeflow.providers.base import (
@@ -379,14 +379,14 @@ class ProviderBudgetLedger:
     @contextlib.contextmanager
     def _locked(self):
         with self.path.open("a+", encoding="utf-8") as handle:
-            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            portalocker.lock(handle, portalocker.LOCK_EX)
             try:
                 events = _read_events(handle)
                 self._validate_prefix(events)
                 self._validate_or_bootstrap_high_water(events)
                 yield handle
             finally:
-                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+                portalocker.unlock(handle)
 
     def _append_event(
         self,
@@ -503,14 +503,15 @@ class ProviderBudgetLedger:
             os.fsync(handle.fileno())
         try:
             os.replace(temp_path, self.high_water_path)
-            directory_fd = os.open(
-                self.high_water_path.parent,
-                os.O_RDONLY,
-            )
-            try:
-                os.fsync(directory_fd)
-            finally:
-                os.close(directory_fd)
+            if os.name != "nt":
+                directory_fd = os.open(
+                    self.high_water_path.parent,
+                    os.O_RDONLY,
+                )
+                try:
+                    os.fsync(directory_fd)
+                finally:
+                    os.close(directory_fd)
         finally:
             temp_path.unlink(missing_ok=True)
 
