@@ -8,14 +8,30 @@ TUI-set reminder always delivers to the TUI instead of racing to an IM channel.
 from __future__ import annotations
 
 import asyncio
+import multiprocessing
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from queue import Empty
 
 from codeflow.proactive_engine.schedulers.cron.service import _CLAIM_TTL_MS, CronService
 from codeflow.proactive_engine.schedulers.cron.types import CronSchedule
 
 _START = datetime(2026, 1, 1, tzinfo=UTC)
 _DUE = _START + timedelta(minutes=1)
+
+
+def _run_due_in_process(store_path: str, started, release, deliveries) -> None:
+    """Exercise the shared jobs.json claim path across OS processes."""
+    async def run() -> None:
+        async def callback(job) -> None:
+            deliveries.put(job.id)
+            started.set()
+            await asyncio.to_thread(release.wait, 5)
+
+        service = CronService(Path(store_path), on_job=callback, now_fn=lambda: _DUE)
+        await service.run_due()
+
+    asyncio.run(run())
 
 
 def _add_due_tui_job(store_path: Path) -> str:
@@ -139,3 +155,36 @@ async def test_expired_owner_cannot_overwrite_new_claim(tmp_path: Path) -> None:
     assert persisted[0].state.last_status == "ok"
     assert persisted[0].state.last_error is None
     assert persisted[0].state.claimed_by_pid is None
+
+
+def test_two_processes_claim_due_job_once(tmp_path: Path) -> None:
+    """The sidecar file lock serializes claims across independent processes."""
+    context = multiprocessing.get_context("spawn")
+    store = tmp_path / "jobs.json"
+    job_id = _add_due_tui_job(store)
+
+    first_started = context.Event()
+    release_first = context.Event()
+    deliveries = context.Queue()
+    first = context.Process(
+        target=_run_due_in_process,
+        args=(str(store), first_started, release_first, deliveries),
+    )
+    second = context.Process(
+        target=_run_due_in_process,
+        args=(str(store), context.Event(), context.Event(), deliveries),
+    )
+    first.start()
+    assert first_started.wait(10), "first process did not enter the claimed callback"
+    second.start()
+    second.join(10)
+    assert second.exitcode == 0
+    release_first.set()
+    first.join(10)
+    assert first.exitcode == 0
+    assert deliveries.get(timeout=2) == job_id
+    try:
+        duplicate = deliveries.get(timeout=0.2)
+    except Empty:
+        duplicate = None
+    assert duplicate is None

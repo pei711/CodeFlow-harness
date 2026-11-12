@@ -41,6 +41,12 @@ bundle an external Memory implementation. Shell commands can run in Anthropic's
 SRT operating-system sandbox or BoxLite MicroVMs. SRT fails closed when its
 runtime or platform isolation is unavailable.
 
+Cron jobs coordinate due-job claims across processes with a sidecar file lock
+and persisted claim state. Stale claims can be taken over after 30 minutes, so
+a crash or a long-running callback may cause a retry or duplicate trigger;
+callbacks with external side effects should be idempotent. This applies to
+scheduled Cron jobs only; the in-memory Spine session queue is process-local.
+
 Context management follows CodeFlow's layered approach. Before each model call,
 it budgets the prefix, Memory, Skills, relevant memories, and history while
 preserving the current user request. As history pressure rises, it first snips

@@ -15,13 +15,13 @@
 | Shell / checkpoint | asyncio 子进程 | Shell 和 checkpoint 取消时需回收直接子进程；共享 checkpoint 的 add/diff/commit 事务需串行 |
 | AgentLoop 共享资源 | executor 启动锁、MCP connecting 标志 | Turn 错误会关闭其他 Turn 的 executor；后来的 Turn 会跳过尚未完成的 MCP 初始化。本次增加使用计数和初始化等待 |
 | SubagentManager | asyncio task、独立 registry/executor、独立 gate、限频、结果重注入 | 所有开发任务共享代码目录；完成映射被清理，不保留工作区状态 |
-| Session / 共享存储 | `utils/atomic_io.py`、`portable_lock.py` 已使用 portalocker、epoch、读检查写事务；Gateway 单实例保护 | 没有跨进程任务领取队列，不新增通用 claim 锁或租约 |
+| Session / 共享存储 | `utils/atomic_io.py`、`portable_lock.py` 已使用 portalocker、epoch、读检查写事务；Gateway 单实例保护 | Spine 队列没有跨进程任务领取；CronService 是独立例外，使用 jobs.json sidecar 文件锁与带 TTL 的 claim 协调到期任务 |
 
 必须修复：文件 I/O、取消期间锁的生命周期、版本校验与原子写、checkpoint 事务和子进程取消清理。
 
 建议且本次实现：显式 `spawn(..., development=True)` 的隔离开发工作区，以及单独的 Review → 临时集成 → Verifier → 目标引用提升 API。普通 spawn/聊天不创建 worktree。不猜测任务文本是否需要独立开发。
 
-暂不实现：分布式调度、持久化任务领取、租约/重试/幂等、进程崩溃自动恢复、模型自动审代码/解决冲突、自动提交全部修改。现有子 Agent 的自然语言完成状态不是代码验收证据。
+暂不实现：Spine 队列的跨进程领取、分布式任务租约/重试/幂等、进程崩溃自动恢复、模型自动审代码/解决冲突、自动提交全部修改。CronService 的定时任务 claim 是单独机制，不代表 Spine 队列具备持久化领取；Cron Callback 的外部副作用仍需调用方提供幂等保障。现有子 Agent 的自然语言完成状态不是代码验收证据。
 
 ## 验证与边界
 
@@ -73,7 +73,7 @@ API 的 approved_reviews 是受信任协调者传入的批准结果，不是自�
 
 ### 共享状态边界
 
-不新增跨进程任务领取锁：Scheduler / Lane 的队列和 Future 都在本进程内，SubagentManager 也没有磁盘任务 claim API。已有 Session 的跨进程 portalocker / epoch / 原子写事务继续保留。Checkpoint 新增的是单个 AgentLoop 持有的 CheckpointService 的事务锁；Git 自身的 index.lock 不等于 add/diff/commit 事务锁。
+Scheduler / Lane 的队列和 Future 都在本进程内，SubagentManager 也没有磁盘任务 claim API。CronService 则通过共享 jobs.json 的 sidecar portalocker 锁与持久化 claim 字段协调多进程到期执行；TTL 超时可能接管仍在运行的长任务，因此这不是 exactly-once 保障，Callback 外部副作用应具备幂等性。已有 Session 的跨进程 portalocker / epoch / 原子写事务继续保留。Checkpoint 新增的是单个 AgentLoop 持有的 CheckpointService 的事务锁；Git 自身的 index.lock 不等于 add/diff/commit 事务锁。
 
 同时启动多个独立 Runtime 写同一代码目录、同一 shadow.git 不在新增保证内，应使用独立工作区和 state root。Worktree 管理与提升 API 也要求单个 Host 协调，不支持外部 Git 管理命令同时切换目标分支。若未来增加多消费者任务队列，应单独设计持久化领取事务、租约、超时回收、幂等和崩溃恢复，并用两个独立进程验证；本次不声称跨进程任务 exactly-once。
 
@@ -148,7 +148,7 @@ uv run --no-sync python -X utf8 -m pytest @modules -q --basetemp=.pytest-tmp/con
 
 新增四个测试模块共 34 个用例，分别验证：Lane 提交顺序、跨会话推进、4/2 额度、Future 单次完成、取消和异常后的名额释放；真实线程并行读、带旧版本的写入冲突、CRLF 编辑合并、取消收尾与重复取消释放；checkpoint 事务；真实 Git Worktree 的目录/分支隔离、脏目录保留、Review 过期、合并冲突、真实编译/测试、验证失败不更新目标、目标前进/被检出时拒绝提升、集成和子任务取消；共享 executor/MCP 的并发初始化、失败与重连；Shell 直接进程回收及真实子进程取消后不能继续延迟写文件。
 
-跨进程任务领取、进程被杀后的任务恢复测试不适用：本次没有增加这两种机制。既有 Session / Atomic I/O / Gateway 文件锁测试已包含在验收范围中。真实 Linux、SRT OS 沙箱和 Boxlite VM 没有在本机启动验证；SRT 的取消路径通过 mock 验证，不能据此声称在真实 VM 或生产环境验收完成。
+Spine 队列的跨进程领取与进程被杀后的自动恢复不在本次改造范围内。CronService 的多进程 claim 及 TTL 接管应单独验证，不能由 Session / Atomic I/O / Gateway 文件锁测试替代。真实 Linux、SRT OS 沙箱和 Boxlite VM 没有在本机启动验证；SRT 的取消路径通过 mock 验证，不能据此声称在真实 VM 或生产环境验收完成。
 
 ## 最终结果（2026-10-25）
 

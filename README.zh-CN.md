@@ -34,6 +34,8 @@ CLI、原生 TUI、后台 Gateway、定时任务和消息渠道共用同一套 R
 Shell 可选择 Anthropic SRT 操作系统沙箱或 BoxLite MicroVM；SRT 初始化或运行不可用时会拒绝执行，
 不会静默退回宿主机 Shell。
 
+Cron 定时任务通过共享 Store 上的跨进程文件锁与持久化 Claim 协调，避免多个活跃 Runtime 同时领取同一到期任务；过期 Claim 可在 30 分钟后接管。进程崩溃或长任务超过 Claim TTL 时仍可能重试或重复触发，因此回调的外部副作用应具备幂等性。这项能力只适用于 Cron 定时任务，不代表内存中的 Spine 会话队列支持跨进程领取。
+
 CodeFlow 也提供 CodeFlowBench，用来评估 Agent Runtime、Context、工具与记忆相关能力。
 外部 Memory Backend 可以按需接入；未配置时，系统会明确保持关闭状态。项目运行环境为
 Python 3.12，原生 TUI 使用 Node.js 22。
