@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | 多会话调度降低队头阻塞 | `docs/evaluation/runtime-scheduler-experiments.md` | 冻结的真实 Provider 对照包含 4,160 个 Turn；P95 中位数由 13,567.997 ms 降至 11,663.193 ms；Verifier 为 4,158/4,160（99.95%）。 | 所有任务通过的预注册门槛未通过，实验标为 `claim_eligible: false`；这是特定突发负载，不是生产 SLO。 |
 | 定时任务多进程 claim | `codeflow/proactive_engine/schedulers/cron/service.py`、`tests/test_cron_service_claim.py` | 共享 jobs.json 的 sidecar 文件锁保护 claim 和持久化；新回归测试以两个独立 OS 进程竞争同一到期任务。 | claim 使用 30 分钟 TTL。超时后可接管，长任务可能重复触发；外部副作用需要幂等。不能将此描述成跨崩溃 exactly-once。 |
-| 开发任务 Worktree 隔离 | `docs/examples/concurrency-and-worktrees.md`、`codeflow/agent/subagent/worktree.py` | 显式开发模式下为任务提供独立 Git 工作区及 Review / Verifier / Promote 流程。 | Worktree 是目录和版本隔离，不是 OS 安全沙箱；没有找到简历所写“10 个场景、100%”对应的正式汇总。 |
+| 开发任务 Worktree 隔离 | `docs/examples/concurrency-and-worktrees.md`、`codeflow/agent/subagent/worktree.py` | 显式开发模式下为任务提供独立 Git 工作区及 Review / Verifier / Promote 流程。 | Worktree 是目录和版本隔离，不是 OS 安全沙箱。简历中 10 个场景、100% 的表述属于任务恢复，不能归到 Worktree 隔离结果。 |
 | 上下文压缩与跨轮约束保持 | `docs/evaluation/context-management-fix.md` | 15 对探索性真实模型试验中，治理组 13/15 严格通过，输入减少数字按文档的指定子集统计；所有失败仍保留。 | 这是小样本探索性结果，存在两次严格 Verifier 失败；无法映射到简历所写 Judge +0.8、约束保留 +26%、Token -13.44% 的同一实验口径。 |
 | 上下文阈值对比 | `benchmark/context_threshold_ablation/summary.md` | 文档保留正式试验中断原因和部分运行记录。 | 正式矩阵不完整，不能选出最佳阈值，也不能把部分样本作为完整对照结论。 |
 
@@ -18,6 +18,16 @@
 - 安全评测 30 个场景重复 3 轮：仓库有沙箱和安全测试，但没有找到与 90 次运行对应的完整记录、策略快照和汇总脚本。测试代码存在不等于该数字已经复现。
 - 8 路读取 185.31 ms → 51.50 ms：没有找到对应的基线、样本定义、重复次数和原始计时结果。
 - SWE-bench 50 题对照按单独约定排除在本轮范围之外。
+
+## 简历相关的相近功能及边界
+
+| 相近名称 | 各自职责 | 结论 |
+| --- | --- | --- |
+| Spine Scheduler / CronService | Spine 管理进程内会话队列；CronService 管理持久化定时任务并用文件锁协调领取。 | 调度对象与存储边界不同，不应当合并或将 Cron claim 描述为 Spine 的跨进程能力。 |
+| ContextBuilder / ContextAssembler | 前者保留共享资源、估算和兼容接口；后者通过分段构建器负责每轮实际上下文组装。 | 不是两个并行生产组装入口，旧接口仍有调用者，删除前需要迁移和验证。 |
+| Worktree / Checkpoint | Worktree 隔离开发任务的 Git 工作目录；Checkpoint 使用独立 shadow Git 保存工作区快照。 | 分别服务并发隔离和恢复证据；Checkpoint 不保存对话状态，也不是完整崩溃恢复。 |
+| ResourceLockManager / portable file lock | 前者协调单进程内工具对重叠路径的读写；后者通过相邻锁文件协调参与者跨进程写入。 | 锁范围不同，不能互相替换；外部不遵守锁的进程仍可修改文件。 |
+| Direct / SRT / BoxLite 执行器 | 三者实现同一个执行接口，但隔离方式和能力不同。 | 是可配置后端，不是重复实现；安全测试应按实际选中的后端分别报告。 |
 
 ## 后续执行顺序
 
