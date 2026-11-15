@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeFlow-harness · 支持并发与多轮对话的 Agent Harness</title>
+<meta name="description" content="CodeFlow-harness：开源 Agent Harness，支持并发任务与多轮会话，具备分层上下文治理、Checkpoint/Resume 断点恢复、SRT Shell 沙箱与回归评测。">
+<style>
+  :root{
+    --bg:#0b1020; --panel:#111830; --panel2:#0e1428; --ink:#e5e9f2; --sub:#9aa7c2;
+    --line:#22304f; --accent:#5ea2ff; --accent2:#a78bfa; --code:#0a0f1e;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.75}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px}
+  nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0}
+  nav .logo{font-weight:800;font-size:18px;color:var(--ink)}
+  nav .links a{margin-left:18px;color:var(--sub);font-size:14px}
+  .hero{text-align:center;padding:56px 0 30px}
+  .hero h1{font-size:44px;font-weight:900;letter-spacing:.5px;background:linear-gradient(90deg,#5ea2ff,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero .en{font-size:19px;color:var(--ink);margin-top:10px}
+  .hero .zh{color:var(--sub);font-size:15px;margin-top:10px;max-width:720px;margin-left:auto;margin-right:auto}
+  .badges{margin-top:20px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .badge{border:1px solid var(--line);background:var(--panel);color:var(--sub);padding:4px 12px;border-radius:999px;font-size:13px}
+  .cta{margin-top:26px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:11px 24px;border-radius:10px;font-weight:700;font-size:15px}
+  .btn-primary{background:var(--accent);color:#081120}
+  .btn-primary:hover{text-decoration:none;opacity:.9}
+  .btn-ghost{border:1px solid var(--line);color:var(--ink)}
+  .btn-ghost:hover{text-decoration:none;border-color:var(--accent)}
+  section{margin:52px 0}
+  h2{font-size:23px;font-weight:800;margin-bottom:18px}
+  h2 small{display:block;font-size:13px;color:var(--sub);font-weight:400;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3{font-size:16px;margin-bottom:6px}
+  .card p{color:var(--sub);font-size:14px}
+  .flow{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:24px;overflow-x:auto}
+  .flow-row{display:flex;align-items:center;gap:10px;justify-content:center;flex-wrap:nowrap;min-width:640px}
+  .node{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:14px;text-align:center;white-space:nowrap}
+  .node b{color:var(--accent)}
+  .arrow{color:var(--sub);font-size:16px}
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .metric{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;text-align:center}
+  .metric .num{font-size:24px;font-weight:800;color:var(--accent)}
+  .metric .lbl{font-size:13px;color:var(--sub);margin-top:4px}
+  .note{color:var(--sub);font-size:12.5px;margin-top:12px}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:12px;padding:18px;overflow-x:auto;font-size:13.5px;line-height:1.6;color:#c9d6f2}
+  .step{margin-bottom:18px}
+  .step h3{font-size:15px;margin-bottom:8px;color:var(--ink)}
+  footer{padding:34px 0 54px;text-align:center;color:var(--sub);font-size:13.5px;border-top:1px solid var(--line);margin-top:60px}
+  @media(max-width:760px){.grid,.metrics{grid-template-columns:1fr 1fr}.hero h1{font-size:32px}}
+  @media(max-width:480px){.grid,.metrics{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <span class="logo">CodeFlow-harness</span>
+    <span class="links">
+      <a href="#features">核心能力</a>
+      <a href="#arch">架构</a>
+      <a href="#metrics">评测数据</a>
+      <a href="#start">快速开始</a>
+      <a href="https://github.com/pei711/CodeFlow-harness" target="_blank" rel="noopener">GitHub</a>
+    </span>
+  </nav>
+
+  <div class="hero">
+    <h1>CodeFlow-harness</h1>
+    <p class="en">An Agent Harness for concurrent tasks and multi-turn conversations.</p>
+    <p class="zh">开源的 Agent 运行时框架：让任务执行可重放、可评测，工具执行边界显式可控。会话队列与并发上限保证同一会话内工具顺序、不同会话并行运行；上下文按预算治理与压缩；中断的任务可以从检查点恢复。</p>
+    <div class="badges">
+      <span class="badge">Python 3.12</span>
+      <span class="badge">Apache-2.0</span>
+      <span class="badge">Status · Alpha</span>
+      <span class="badge">CLI · TUI · Gateway · 飞书</span>
+    </div>
+    <div class="cta">
+      <a class="btn btn-primary" href="https://github.com/pei711/CodeFlow-harness" target="_blank" rel="noopener">在 GitHub 查看</a>
+      <a class="btn btn-ghost" href="#start">快速开始</a>
+    </div>
+  </div>
+
+  <section id="features">
+    <h2>核心能力</h2>
+    <div class="grid">
+      <div class="card"><h3>并发调度与多轮会话</h3><p>会话级队列 + 并发上限：同一对话内工具调用严格保序，不同会话并行执行，调度与取消统一由 Runtime 管理。</p></div>
+      <div class="card"><h3>分层上下文治理</h3><p>每次模型调用前按预算组装前缀、记忆与历史；压力升高时先裁剪旧工具结果，再优先保留近期轮次，高压时将旧历史摘要到边界之后。</p></div>
+      <div class="card"><h3>Checkpoint / Resume</h3><p>任务状态持久化，中断后可从检查点恢复；覆盖进程崩溃、工作区漂移等 10 类恢复场景，恢复过程可验证。</p></div>
+      <div class="card"><h3>Shell 沙箱</h3><p>Shell 命令可运行在 Anthropic SRT 操作系统沙箱或 BoxLite MicroVM 中；隔离不可用时失败关闭（fail-closed），不降级执行。</p></div>
+      <div class="card"><h3>混合记忆检索</h3><p>已完成轮次自动生成本地摘要；新请求通过语义检索 + BM25 取回最多 3 条相关摘要，RRF 融合排序，无外部后端也可工作。</p></div>
+      <div class="card"><h3>回归评测体系</h3><p>评测覆盖调度、模型调用成本、上下文与记忆、工具执行与恢复五条线，让每次改动的效果可量化、可对比。</p></div>
+    </div>
+  </section>
+
+  <section id="arch">
+    <h2>架构<small>CLI、原生 TUI、Gateway、定时任务与消息渠道共享同一个 Runtime 与同一套执行边界</small></h2>
+    <div class="flow">
+      <div class="flow-row">
+        <span class="node">你</span><span class="arrow">→</span>
+        <span class="node">CLI · TUI · Gateway<br>定时任务 · 飞书</span><span class="arrow">→</span>
+        <span class="node"><b>Spine</b></span><span class="arrow">→</span>
+        <span class="node"><b>Turn Runner</b></span><span class="arrow">→</span>
+        <span class="node"><b>Agent Loop</b></span>
+      </div>
+      <div class="flow-row" style="margin-top:14px">
+        <span class="node">Agent Loop ⇄ Context</span>
+        <span class="node">Agent Loop ⇄ Memory（可选）</span>
+        <span class="node">Agent Loop ⇄ Tools · MCP · Sandbox</span>
+        <span class="node">Agent Loop ⇄ Providers</span>
+      </div>
+      <div class="flow-row" style="margin-top:14px">
+        <span class="node">Turn Runner → Session · Tracing · Delivery</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="metrics">
+    <h2>评测数据</h2>
+    <div class="metrics">
+      <div class="metric"><div class="num">10,000</div><div class="lbl">压测请求 · 0 丢失 · 0 重复</div></div>
+      <div class="metric"><div class="num">13.57s → 11.66s</div><div class="lbl">4,160 次真实 Agent 请求端到端 P95</div></div>
+      <div class="metric"><div class="num">−26.44%</div><div class="lbl">输入 Token 消耗（Verifier 通过率保持 100%）</div></div>
+      <div class="metric"><div class="num">99.95%</div><div class="lbl">自动验收通过率</div></div>
+      <div class="metric"><div class="num">185ms → 52ms</div><div class="lbl">8 路并发读取中位耗时</div></div>
+      <div class="metric"><div class="num">10 / 10</div><div class="lbl">故障恢复场景覆盖 · 工作区漂移识别率 100%</div></div>
+    </div>
+    <p class="note">注：以上为项目在各自工作负载与基线下的评测结果，对比仅适用于所标注的测试口径。</p>
+  </section>
+
+  <section id="start">
+    <h2>快速开始</h2>
+    <div class="step">
+      <h3>1 · 克隆并安装（需要 Python 3.12；原生 TUI 需要 Node.js 22，安装器可代为准备）</h3>
+      <pre>git clone https://github.com/pei711/CodeFlow-harness.git
+cd CodeFlow-harness
+./install.sh</pre>
+    </div>
+    <div class="step">
+      <h3>Windows PowerShell</h3>
+      <pre>git clone https://github.com/pei711/CodeFlow-harness.git
+Set-Location CodeFlow-harness
+.\install.ps1</pre>
+    </div>
+    <div class="step">
+      <h3>2 · 在你的项目里完成初始化</h3>
+      <pre>cd /path/to/your-project
+codeflow onboard --skip-memory</pre>
+    </div>
+    <p class="note">四步向导：LLM 凭据 → 显式关闭 Memory → 第一个真实 Turn → 验证结果。更多文档见仓库 docs/onboarding 目录。</p>
+  </section>
+
+  <footer>
+    CodeFlow-harness · Apache-2.0 License · 作者 <a href="https://pei711.github.io/" target="_blank" rel="noopener">张钧沛</a> ·
+    <a href="https://github.com/pei711/CodeFlow-harness" target="_blank" rel="noopener">github.com/pei711/CodeFlow-harness</a>
+  </footer>
+
+</div>
+</body>
+</html>
