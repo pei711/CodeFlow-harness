@@ -61,16 +61,16 @@ class _Base(BaseModel):
 class ContextConfig(_Base):
     """Context Assembly 与 Curator History Path 的 Selection/Tuning。
 
-    当前 Runtime 只有统一 `ContextAssembler`；保留 `engine` 仅为旧配置兼容。其余参数控制 Fast/Slow Path、
+    当前 Runtime 只有统一 `ContextAssembler`；`engine` 只切换 History lane 实现。其余参数控制 Fast/Slow Path、
     Relevance、Protected Head 与 Archive Location，不直接改变 Provider Context Window。
     """
 
     engine: str = "unified"
-    """Deprecated：现在只有一个 :class:`ContextAssembler`。
+    """History lane 选择：Assembler 始终只有一个，本字段只切换 History 实现。
 
-    Historical ``"legacy"`` / ``"curator"`` / ``"default"`` Split 已合并；每 Turn 在同一 Engine 运行
-    Curator History、Memory、Local Skill Lanes。Field 保留为 Free String，使旧 YAML ``engine: legacy`` 等
-    仍可加载；``build_context_engine`` 忽略其 Value。
+    ``"curator"`` 时 History lane 用 CuratorSegmentBuilder（fast/slow/fallback + trace 落盘）；
+    其余值（含旧 YAML 的 ``"legacy"`` / ``"default"``）用 CodeFlowHistorySegmentBuilder。
+    Field 保留为 Free String，使旧配置仍可加载。
     """
 
     # Curator 历史路径参数。

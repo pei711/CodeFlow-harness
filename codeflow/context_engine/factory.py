@@ -29,6 +29,7 @@ from codeflow.context_engine.segments import (
     SkillsSegmentBuilder,
 )
 from codeflow.context_engine.segments.codeflow_history import CodeFlowHistorySegmentBuilder
+from codeflow.context_engine.segments.curator import CuratorSegmentBuilder
 from codeflow.providers.base import LLMProvider
 
 if TYPE_CHECKING:
@@ -78,8 +79,9 @@ def build_context_engine(
 ) -> ContextEngine:
     """从扁平 SegmentBuilder 列表构建唯一 :class:`ContextAssembler`。
 
-    ``config.engine`` 已不再是 dispatch key，因为只有一个 Engine；字段留在
-    :class:`ContextConfig` 仅为配置 back-compat，本函数有意忽略。``builder`` 当前只作为共享
+    Assembler 始终只有一个；``config.engine`` 只选择 History lane 的实现：``"curator"`` 时用
+    :class:`CuratorSegmentBuilder`（fast/slow/fallback 选择并写 trace），其余值用
+    :class:`CodeFlowHistorySegmentBuilder`。``builder`` 当前只作为共享
     ``MemoryStore`` / ``LocalSkillCatalog`` 的持有者，待低层兼容结构退休后可移除。
 
     缺失 Memory 与 SkillForgeRouter 配置时创建默认值。Memory Segment 总是提供 Host Memory，
@@ -110,6 +112,27 @@ def build_context_engine(
     )
     activation_max = 0 if summary_only else configured_inject_max or skill_forge_router_config.top_k
 
+    if config.engine == "curator":
+        history_builder: CodeFlowHistorySegmentBuilder | CuratorSegmentBuilder = CuratorSegmentBuilder(
+            workspace=builder.state,
+            config=config,
+            provider=provider,
+            model=model,
+            context_window_tokens=context_window_tokens,
+            get_tool_definitions=get_tool_definitions,
+            now_fn=now_fn,
+            memory_enabled=backend is not None,
+        )
+    else:
+        history_builder = CodeFlowHistorySegmentBuilder(
+            state_root=builder.state,
+            config=config,
+            provider=provider,
+            model=model,
+            context_window_tokens=context_window_tokens,
+            get_tool_definitions=get_tool_definitions,
+        )
+
     builders = [
         IdentitySegmentBuilder(workspace, builder.state),
         BootstrapSegmentBuilder(builder.state),
@@ -127,14 +150,7 @@ def build_context_engine(
             skill_top_k=skill_forge_router_config.top_k,
             activation_max=activation_max,
         ),
-        CodeFlowHistorySegmentBuilder(
-            state_root=builder.state,
-            config=config,
-            provider=provider,
-            model=model,
-            context_window_tokens=context_window_tokens,
-            get_tool_definitions=get_tool_definitions,
-        ),
+        history_builder,
     ]
     return ContextAssembler(builders, get_tool_definitions, now_fn=now_fn)
 
