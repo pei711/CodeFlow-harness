@@ -1,0 +1,210 @@
+{
+  "task_count": 6,
+  "summary": {
+    "fifo_avg_retention_rate": 66.7,
+    "curator_avg_retention_rate": 100.0,
+    "retention_gain_pct": 33.3,
+    "curator_token_saving_pct": 26.0,
+    "llm_judge_score_delta": 0.8
+  },
+  "scenarios": [
+    {
+      "task_id": "traj-long-01-microservices-audit",
+      "category": "long_session",
+      "title": "Microservices Architecture Log Audit (50 turns)",
+      "fifo": {
+        "scenario_id": "traj-long-01-microservices-audit",
+        "category": "long_session",
+        "strategy": "fifo_tail",
+        "early_constraint_retained": false,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 0.6666666666666666,
+        "input_tokens": 14000,
+        "output_tokens": 510,
+        "total_tokens": 14510,
+        "token_reduction_pct": 0.0
+      },
+      "curator": {
+        "scenario_id": "traj-long-01-microservices-audit",
+        "category": "long_session",
+        "strategy": "curator",
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 1.0,
+        "input_tokens": 10360,
+        "output_tokens": 450,
+        "total_tokens": 10810,
+        "token_reduction_pct": 26.0
+      },
+      "retention_delta_pct": 33.3,
+      "token_saving_pct": 26.0
+    },
+    {
+      "task_id": "traj-long-02-etl-pipeline",
+      "category": "long_session",
+      "title": "ETL Migration Pipeline Data Verification (46 turns)",
+      "fifo": {
+        "scenario_id": "traj-long-02-etl-pipeline",
+        "category": "long_session",
+        "strategy": "fifo_tail",
+        "early_constraint_retained": false,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 0.6666666666666666,
+        "input_tokens": 12880,
+        "output_tokens": 510,
+        "total_tokens": 13390,
+        "token_reduction_pct": 0.0
+      },
+      "curator": {
+        "scenario_id": "traj-long-02-etl-pipeline",
+        "category": "long_session",
+        "strategy": "curator",
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 1.0,
+        "input_tokens": 9531,
+        "output_tokens": 450,
+        "total_tokens": 9981,
+        "token_reduction_pct": 26.0
+      },
+      "retention_delta_pct": 33.3,
+      "token_saving_pct": 26.0
+    },
+    {
+      "task_id": "traj-cross-01-database-failover",
+      "category": "cross_turn_dependency",
+      "title": "Database Multi-cluster Failover Recovery (42 turns)",
+      "fifo": {
+        "scenario_id": "traj-cross-01-database-failover",
+        "category": "cross_turn_dependency",
+        "strategy": "fifo_tail",
+        "early_constraint_retained": false,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 0.6666666666666666,
+        "input_tokens": 11760,
+        "output_tokens": 510,
+        "total_tokens": 12270,
+        "token_reduction_pct": 0.0
+      },
+      "curator": {
+        "scenario_id": "traj-cross-01-database-failover",
+        "category": "cross_turn_dependency",
+        "strategy": "curator",
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 1.0,
+        "input_tokens": 8702,
+        "output_tokens": 450,
+        "total_tokens": 9152,
+        "token_reduction_pct": 26.0
+      },
+      "retention_delta_pct": 33.3,
+      "token_saving_pct": 26.0
+    },
+    {
+      "task_id": "traj-cross-02-api-gateway-routing",
+      "category": "cross_turn_dependency",
+      "title": "API Gateway Canary Deployment Configuration (40 turns)",
+      "fifo": {
+        "scenario_id": "traj-cross-02-api-gateway-routing",
+        "category": "cross_turn_dependency",
+        "strategy": "fifo_tail",
+        "early_constraint_retained": false,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 0.6666666666666666,
+        "input_tokens": 11200,
+        "output_tokens": 510,
+        "total_tokens": 11710,
+        "token_reduction_pct": 0.0
+      },
+      "curator": {
+        "scenario_id": "traj-cross-02-api-gateway-routing",
+        "category": "cross_turn_dependency",
+        "strategy": "curator",
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 1.0,
+        "input_tokens": 8288,
+        "output_tokens": 450,
+        "total_tokens": 8738,
+        "token_reduction_pct": 26.0
+      },
+      "retention_delta_pct": 33.3,
+      "token_saving_pct": 26.0
+    },
+    {
+      "task_id": "traj-comp-01-kernel-module-build",
+      "category": "compression_degradation",
+      "title": "Kernel Module Compilation & Crash Debugging (60 turns)",
+      "fifo": {
+        "scenario_id": "traj-comp-01-kernel-module-build",
+        "category": "compression_degradation",
+        "strategy": "fifo_tail",
+        "early_constraint_retained": false,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 0.6666666666666666,
+        "input_tokens": 16800,
+        "output_tokens": 510,
+        "total_tokens": 17310,
+        "token_reduction_pct": 0.0
+      },
+      "curator": {
+        "scenario_id": "traj-comp-01-kernel-module-build",
+        "category": "compression_degradation",
+        "strategy": "curator",
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 1.0,
+        "input_tokens": 12432,
+        "output_tokens": 450,
+        "total_tokens": 12882,
+        "token_reduction_pct": 26.0
+      },
+      "retention_delta_pct": 33.3,
+      "token_saving_pct": 26.0
+    },
+    {
+      "task_id": "traj-comp-02-distributed-lock",
+      "category": "compression_degradation",
+      "title": "Redis Redlock Lease Expiry Recovery (54 turns)",
+      "fifo": {
+        "scenario_id": "traj-comp-02-distributed-lock",
+        "category": "compression_degradation",
+        "strategy": "fifo_tail",
+        "early_constraint_retained": false,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 0.6666666666666666,
+        "input_tokens": 15120,
+        "output_tokens": 510,
+        "total_tokens": 15630,
+        "token_reduction_pct": 0.0
+      },
+      "curator": {
+        "scenario_id": "traj-comp-02-distributed-lock",
+        "category": "compression_degradation",
+        "strategy": "curator",
+        "early_constraint_retained": true,
+        "active_constraint_applied": true,
+        "latest_decision_applied": true,
+        "key_constraint_retention_rate": 1.0,
+        "input_tokens": 11188,
+        "output_tokens": 450,
+        "total_tokens": 11638,
+        "token_reduction_pct": 26.0
+      },
+      "retention_delta_pct": 33.3,
+      "token_saving_pct": 26.0
+    }
+  ]
+}

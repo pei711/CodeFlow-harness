@@ -1,0 +1,210 @@
+{
+  "schema": "codeflow.codeflowbench.trajectory-tasks.v1",
+  "total_tasks": 3,
+  "tasks": [
+    {
+      "task_id": "traj-long-01-microservices-audit",
+      "category": "long_session",
+      "title": "Microservices Architecture Log Audit (50 turns)",
+      "message_count": 50,
+      "early_constraint": "All timestamp outputs must be formatted in Asia/Shanghai timezone.",
+      "active_constraint": "All service latency metrics must be calculated at p95 and p99 quantiles.",
+      "latest_decision": "Flag service-billing as degraded and assign ticket to oncall-sre.",
+      "noise_topic": "team-lunch-ordering",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Begin microservice audit. Constraint: All timestamp outputs must be formatted in Asia/Shanghai timezone."
+        },
+        {
+          "role": "assistant",
+          "thought": "Understood. Initializing audit with Asia/Shanghai timezone constraint.",
+          "content": "Audit initialized with Asia/Shanghai timezone constraint."
+        },
+        {
+          "role": "user",
+          "content": "Search logs for service-auth."
+        },
+        {
+          "role": "assistant",
+          "tool_calls": [
+            {
+              "name": "file_search",
+              "args": {
+                "query": "service-auth error"
+              }
+            }
+          ],
+          "content": ""
+        },
+        {
+          "role": "tool",
+          "name": "file_search",
+          "content": "Found 12 error entries in /logs/service-auth.log"
+        },
+        {
+          "role": "assistant",
+          "thought": "service-auth log found. Checking billing next.",
+          "content": "Auth service has 12 transient auth errors."
+        },
+        {
+          "role": "user",
+          "content": "Rule update: All service latency metrics must be calculated at p95 and p99 quantiles."
+        },
+        {
+          "role": "assistant",
+          "thought": "Applying active rule for p95/p99 quantiles.",
+          "content": "Rule acknowledged: calculating p95/p99 quantiles."
+        },
+        {
+          "role": "user",
+          "content": "Decision update: Flag service-billing as degraded and assign ticket to oncall-sre."
+        },
+        {
+          "role": "assistant",
+          "thought": "Latest decision recorded: billing degraded -> oncall-sre.",
+          "content": "Billing status updated."
+        },
+        {
+          "role": "user",
+          "content": "Produce final audit summary adhering to all constraints."
+        },
+        {
+          "role": "assistant",
+          "thought": "Synthesizing audit report. Must preserve Asia/Shanghai timezone, p95/p99 quantiles, and billing degraded assignment.",
+          "content": "Audit Summary: service-billing is degraded (assigned to oncall-sre). All metrics calculated at p95/p99. All timestamp outputs formatted in Asia/Shanghai timezone."
+        }
+      ]
+    },
+    {
+      "task_id": "traj-cross-01-database-failover",
+      "category": "cross_turn_dependency",
+      "title": "Database Multi-cluster Failover Recovery (42 turns)",
+      "message_count": 42,
+      "early_constraint": "Failover cluster target is pg-replica-us-west-2.",
+      "active_constraint": "Replication lag threshold must be strictly under 100ms.",
+      "latest_decision": "Promote pg-replica-us-west-2 to standalone primary.",
+      "noise_topic": "office-renovation-plans",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Primary cluster pg-primary-us-east-1 is unreachable. Failover cluster target is pg-replica-us-west-2."
+        },
+        {
+          "role": "assistant",
+          "thought": "Target set: pg-replica-us-west-2.",
+          "content": "Beginning failover targeting pg-replica-us-west-2."
+        },
+        {
+          "role": "user",
+          "content": "Probe replica lag."
+        },
+        {
+          "role": "assistant",
+          "tool_calls": [
+            {
+              "name": "shell",
+              "args": {
+                "command": "pg_stat_replication"
+              }
+            }
+          ],
+          "content": ""
+        },
+        {
+          "role": "tool",
+          "name": "shell",
+          "content": "replica: pg-replica-us-west-2, lag: 38ms"
+        },
+        {
+          "role": "assistant",
+          "thought": "Lag is 38ms.",
+          "content": "Current replication lag is 38ms."
+        },
+        {
+          "role": "user",
+          "content": "Confirm replication lag threshold must be strictly under 100ms."
+        },
+        {
+          "role": "assistant",
+          "thought": "Condition met (38ms < 100ms).",
+          "content": "Condition verified."
+        },
+        {
+          "role": "user",
+          "content": "Final instruction: Promote pg-replica-us-west-2 to standalone primary."
+        },
+        {
+          "role": "assistant",
+          "thought": "Promoting pg-replica-us-west-2 per early target and latest decision.",
+          "content": "Promoted pg-replica-us-west-2 to standalone primary with replication lag under 100ms."
+        }
+      ]
+    },
+    {
+      "task_id": "traj-comp-01-kernel-module-build",
+      "category": "compression_degradation",
+      "title": "Kernel Module Compilation & Crash Debugging (60 turns)",
+      "message_count": 60,
+      "early_constraint": "Kernel target architecture must be arm64 with CONFIG_KASAN=y.",
+      "active_constraint": "Optimization flag must remain -O2 throughout compilation.",
+      "latest_decision": "Apply patch to mm/page_alloc.c to fix race condition.",
+      "noise_topic": "desk-ergonomics-discussion",
+      "turns": [
+        {
+          "role": "user",
+          "content": "Build kernel module. Critical early constraint: Kernel target architecture must be arm64 with CONFIG_KASAN=y."
+        },
+        {
+          "role": "assistant",
+          "thought": "Arch target: arm64 with CONFIG_KASAN=y.",
+          "content": "Compilation target set to arm64 with CONFIG_KASAN=y."
+        },
+        {
+          "role": "user",
+          "content": "Execute initial make."
+        },
+        {
+          "role": "assistant",
+          "tool_calls": [
+            {
+              "name": "shell",
+              "args": {
+                "command": "make -j8"
+              }
+            }
+          ],
+          "content": ""
+        },
+        {
+          "role": "tool",
+          "name": "shell",
+          "content": "Error: implicit declaration of page_to_virt in mm/page_alloc.c:1402"
+        },
+        {
+          "role": "assistant",
+          "thought": "Compilation failed with error. Analyzing error for recovery.",
+          "content": "Compilation failed. Investigating page_alloc.c error."
+        },
+        {
+          "role": "user",
+          "content": "Ensure optimization flag must remain -O2 throughout compilation."
+        },
+        {
+          "role": "assistant",
+          "thought": "Keeping -O2 flag.",
+          "content": "Optimization flag -O2 confirmed."
+        },
+        {
+          "role": "user",
+          "content": "Decision: Apply patch to mm/page_alloc.c to fix race condition."
+        },
+        {
+          "role": "assistant",
+          "thought": "Applying fix to mm/page_alloc.c while keeping arm64 CONFIG_KASAN=y target.",
+          "content": "Patch applied to mm/page_alloc.c. Build successful under arm64 CONFIG_KASAN=y with -O2."
+        }
+      ]
+    }
+  ]
+}
