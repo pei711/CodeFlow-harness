@@ -191,16 +191,6 @@ class _Provider:
         raise NotImplementedError
 
 
-def _budget():
-    return TokenBudget(
-        context_length=100_000,
-        reserved_output=4_000,
-        reserved_tools=2_000,
-        reserved_system=1_000,
-        available_history=93_000,
-    )
-
-
 class TestEngineAssembledInvariants:
     async def test_fast_path_prompt_has_single_owned_segments(
         self,
