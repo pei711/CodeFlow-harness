@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CodeFlow-harness · 支持并发与多轮对话的 Agent Harness</title>
-<meta name="description" content="CodeFlow-harness：开源 Agent Harness，支持并发任务与多轮会话，具备分层上下文治理、Checkpoint/Resume 断点恢复、SRT Shell 沙箱与回归评测。">
+<meta name="description" content="CodeFlow-harness：面向多任务并发与长会话的开源 Agent Harness，具备分层上下文治理、混合记忆召回、Checkpoint/Resume 断点恢复、SRT Shell 沙箱与多维回归评测（SWE-bench / 轨迹质量 / 安全）。">
 <style>
   :root{
     --bg:#0b1020; --panel:#111830; --panel2:#0e1428; --ink:#e5e9f2; --sub:#9aa7c2;
@@ -72,7 +72,7 @@
   <div class="hero">
     <h1>CodeFlow-harness</h1>
     <p class="en">An Agent Harness for concurrent tasks and multi-turn conversations.</p>
-    <p class="zh">开源的 Agent 运行时框架：让任务执行可重放、可评测，工具执行边界显式可控。会话队列与并发上限保证同一会话内工具顺序、不同会话并行运行；上下文按预算治理与压缩；中断的任务可以从检查点恢复。</p>
+    <p class="zh">面向本地代码仓库的开源 Agent 运行时框架，支持多任务并发与长会话执行：让任务执行可重放、可评测，工具执行边界显式可控。会话级队列与并发上限保证同一会话内工具顺序、不同会话并行运行；上下文按预算治理与压缩；中断的任务可以从检查点恢复。</p>
     <div class="badges">
       <span class="badge">Python 3.12</span>
       <span class="badge">Apache-2.0</span>
@@ -88,12 +88,12 @@
   <section id="features">
     <h2>核心能力</h2>
     <div class="grid">
-      <div class="card"><h3>并发调度与多轮会话</h3><p>会话级队列 + 并发上限：同一对话内工具调用严格保序，不同会话并行执行，调度与取消统一由 Runtime 管理。</p></div>
+      <div class="card"><h3>并发调度与多轮会话</h3><p>基于 asyncio 的会话级队列 + 并发上限：同一对话内工具调用严格保序，不同会话并行执行；并发写任务用 Git Worktree 隔离工作目录与分支，跨进程锁避免定时任务重复领取。</p></div>
       <div class="card"><h3>分层上下文治理</h3><p>每次模型调用前按预算组装前缀、记忆与历史；压力升高时先裁剪旧工具结果，再优先保留近期轮次，高压时将旧历史摘要到边界之后。</p></div>
       <div class="card"><h3>Checkpoint / Resume</h3><p>任务状态持久化，中断后可从检查点恢复；覆盖进程崩溃、工作区漂移等 10 类恢复场景，恢复过程可验证。</p></div>
       <div class="card"><h3>Shell 沙箱</h3><p>Shell 命令可运行在 Anthropic SRT 操作系统沙箱或 BoxLite MicroVM 中；隔离不可用时失败关闭（fail-closed），不降级执行。</p></div>
-      <div class="card"><h3>混合记忆检索</h3><p>已完成轮次自动生成本地摘要；新请求通过语义检索 + BM25 取回最多 3 条相关摘要，RRF 融合排序，无外部后端也可工作。</p></div>
-      <div class="card"><h3>回归评测体系</h3><p>评测覆盖调度、模型调用成本、上下文与记忆、工具执行与恢复五条线，让每次改动的效果可量化、可对比。</p></div>
+      <div class="card"><h3>混合记忆检索</h3><p>已完成轮次自动生成本地摘要并持久化；新请求经语义向量与 BM25 双路召回（各 Top-3），RRF 融合后取 Top-3 相关记忆，无外部后端也可工作。</p></div>
+      <div class="card"><h3>回归评测体系</h3><p>自研 CodeFlowBench 之外，另以 SWE-bench Verified 50 任务做固定回归集，配合 LLM Judge 轨迹评分与 30 场景安全评测，让每次改动的效果可量化、可对比。</p></div>
     </div>
   </section>
 
@@ -122,12 +122,12 @@
   <section id="metrics">
     <h2>评测数据</h2>
     <div class="metrics">
-      <div class="metric"><div class="num">10,000</div><div class="lbl">压测请求 · 0 丢失 · 0 重复</div></div>
-      <div class="metric"><div class="num">13.57s → 11.66s</div><div class="lbl">4,160 次真实 Agent 请求端到端 P95</div></div>
-      <div class="metric"><div class="num">−26.44%</div><div class="lbl">输入 Token 消耗（Verifier 通过率保持 100%）</div></div>
-      <div class="metric"><div class="num">99.95%</div><div class="lbl">自动验收通过率</div></div>
+      <div class="metric"><div class="num">13.57s → 11.66s</div><div class="lbl">4,160 次真实 Agent 请求端到端 P95 · 自动验收通过率 99.95%</div></div>
       <div class="metric"><div class="num">185ms → 52ms</div><div class="lbl">8 路并发读取中位耗时</div></div>
       <div class="metric"><div class="num">10 / 10</div><div class="lbl">故障恢复场景覆盖 · 工作区漂移识别率 100%</div></div>
+      <div class="metric"><div class="num">32% → 46%</div><div class="lbl">SWE-bench Verified 50 任务解决率（分层治理 vs 阈值式压缩）· 输入 Token −12%</div></div>
+      <div class="metric"><div class="num">+0.8 分</div><div class="lbl">LLM Judge 轨迹评分提升（5 分制）· 关键约束保留率 +26% · Token −13.44%</div></div>
+      <div class="metric"><div class="num">90 次</div><div class="lbl">安全评测回放（30 场景 × 3 轮）· 未审批危险操作与工作区外写入均为 0</div></div>
     </div>
     <p class="note">注：以上为项目在各自工作负载与基线下的评测结果，对比仅适用于所标注的测试口径。</p>
   </section>
