@@ -26,5 +26,32 @@ class PackRegistry:
 _DEFAULT_REGISTRY = PackRegistry()
 
 
+def register_standard_packs(registry: PackRegistry) -> None:
+    try:
+        from .packs.swebench import SwebenchPack
+
+        if "swebench" not in registry._packs:
+            registry.register(SwebenchPack())
+    except ImportError:
+        pass
+
+    try:
+        from .packs.security import SecurityPack
+
+        if "security" not in registry._packs:
+            registry.register(SecurityPack())
+    except ImportError:
+        pass
+
+    try:
+        from .packs.trajectory import TrajectoryPack
+
+        if "trajectory" not in registry._packs:
+            registry.register(TrajectoryPack())
+    except ImportError:
+        pass
+
+
 def default_registry() -> PackRegistry:
+    register_standard_packs(_DEFAULT_REGISTRY)
     return _DEFAULT_REGISTRY

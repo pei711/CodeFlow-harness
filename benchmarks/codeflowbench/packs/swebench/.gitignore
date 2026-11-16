@@ -1,0 +1,5 @@
+*.parquet
+*.tar.gz
+*.zip
+raw_datasets/
+cache/
