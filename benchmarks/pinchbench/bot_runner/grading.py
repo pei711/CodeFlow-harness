@@ -17,7 +17,7 @@ from task_loader import Task
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_JUDGE_MODEL = "anthropic/claude-sonnet-4"
+DEFAULT_JUDGE_MODEL = "anthropic/claude-sonnet-4.6"
 
 
 @dataclass

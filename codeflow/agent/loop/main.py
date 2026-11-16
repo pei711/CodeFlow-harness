@@ -79,7 +79,8 @@ if TYPE_CHECKING:
     from codeflow.proactive_engine.schedulers.cron.service import CronService
     from codeflow.routing.router import ModelRouter
     from codeflow.sandbox.debug_server import SandboxDebugServer
-    from codeflow.spine.runner import Drain, Emit, TurnOutcome
+    from codeflow.spine.runner import Drain, Emit
+    from codeflow.spine.runner import TurnOutcome as SpineTurnOutcome
     from codeflow.spine.turn import TurnRequest
     from codeflow.token_wise.base import UsageSnapshot
     from codeflow.token_wise.registry import StrategyRegistry
@@ -2115,7 +2116,7 @@ class AgentLoop:
         stream: bool = True,
         usage_sink: dict[str, Any] | None = None,
         text_sink: dict[str, Any] | None = None,
-    ) -> TurnOutcome:
+    ) -> SpineTurnOutcome:
         """作为 Spine 原生入口消费 `TurnRequest`，经单一 ``emit`` 扇出事件并返回 TurnOutcome。
 
         这个边界把旧实现的字符串返回值和五类 callback 收拢为一条可观察事件流。名称使用
