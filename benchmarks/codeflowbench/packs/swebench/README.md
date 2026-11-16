@@ -16,10 +16,11 @@
 
 ## 2. 冻结的 50 个 SWE-bench Verified 任务清单
 
-清单文件存储在：
-- `benchmarks/codeflowbench/tasks/swebench/verified_50_manifest.json` (完整 50 任务清单与元数据)
-- `benchmarks/codeflowbench/tasks/swebench/formal.json` (正式 50 任务规格)
-- `benchmarks/codeflowbench/tasks/swebench/smoke.json` (小样本 2 任务快速冒烟规格)
+清单文件存储在 `benchmarks/codeflowbench/tasks/swebench/manifest/`（单一事实源）：
+- `meta.json`（清单元数据：schema / 版本 / 选取说明）
+- `tasks-01.json` … `tasks-05.json`（50 个任务分片，每片 10 个，顺序合并即完整清单）
+
+正式轨道用全部 50 个任务，冒烟轨道用清单前 2 个任务，均由 `tasks.py` 从清单直接派生，不再另存副本。
 
 ### 任务库分布 (覆盖官方 Verified 500 集全部 12 个仓库)
 - `django/django`: 11 任务

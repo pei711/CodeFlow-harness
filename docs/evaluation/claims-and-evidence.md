@@ -28,8 +28,8 @@
 除上述需要大量真实外部模型调用或特定环境的内部实验外，仓库自带完整的**本地免凭据冒烟门禁（CodeFlowBench Smoke Gate）**，任何克隆本仓库的用户均可直接在本地一键运行并验证：
 
 - **验证命令**：`make codeflowbench-smoke`
-- **已入库验证报告**：[docs/evidence/REPORT.md](evidence/REPORT.md)
-- **已入库原始证据**：[docs/evidence/report.json](evidence/report.json)（Evidence Digest: `11527da52c80b3e9d5e17fe275f284e3b3bffd05685a997686b39aceee13fdfb`）
+- **已入库验证报告**：[docs/evaluation/codeflowbench-smoke-report.md](codeflowbench-smoke-report.md)
+- **已入库原始证据**：[docs/evaluation/codeflowbench-smoke-report.json](codeflowbench-smoke-report.json)（Evidence Digest: `11527da52c80b3e9d5e17fe275f284e3b3bffd05685a997686b39aceee13fdfb`）
 - **覆盖轨道**：
   1. **MCP Smoke**：64 个 MCP 工具注册与 `catalog_probe` 调用，验签闭环；
   2. **R0 Scheduler 轨道**：2,000 次请求、64 会话，验证 0 lost requests、0 lifecycle contradictions，P95 分发开销 0.56ms，P95 队列等待 601.33ms；

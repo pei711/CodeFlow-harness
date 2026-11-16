@@ -57,5 +57,5 @@ python benchmarks/codeflowbench/packs/trajectory/scripts/run_comparison.py
 ---
 
 ## 4. 评测结果证据存储
-- 结构化数据：`benchmarks/codeflowbench/packs/trajectory/results/trajectory_eval_results.json`
-- 详细对比报告：`benchmarks/codeflowbench/packs/trajectory/results/REPORT.md`
+- 结构化数据：`docs/evaluation/trajectory-eval-results.json`
+- 详细对比报告：`docs/evaluation/trajectory-eval-report.md`

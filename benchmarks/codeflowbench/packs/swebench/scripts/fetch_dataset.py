@@ -24,9 +24,21 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("swebench.fetch")
 
 DATASET_NAME = "princeton-nlp/SWE-bench_Verified"
-DEFAULT_MANIFEST_PATH = (
-    Path(__file__).resolve().parents[3] / "tasks" / "swebench" / "verified_50_manifest.json"
+DEFAULT_MANIFEST_DIR = (
+    Path(__file__).resolve().parents[3] / "tasks" / "swebench" / "manifest"
 )
+
+
+def _load_manifest(manifest_dir: Path) -> dict:
+    meta_path = manifest_dir / "meta.json"
+    if not meta_path.is_file():
+        raise FileNotFoundError(f"Manifest not found: {manifest_dir}")
+    manifest = json.loads(meta_path.read_text(encoding="utf-8"))
+    tasks: list[dict] = []
+    for chunk_path in sorted(manifest_dir.glob("tasks-*.json")):
+        tasks.extend(json.loads(chunk_path.read_text(encoding="utf-8")).get("tasks", []))
+    manifest["tasks"] = tasks
+    return manifest
 
 
 def fetch_via_datasets_lib(split: str = "test") -> list[dict]:
@@ -72,12 +84,8 @@ def fetch_via_hf_api(limit_total: int = 500, chunk_size: int = 100) -> list[dict
     return all_rows
 
 
-def verify_manifest(manifest_path: Path, dataset_rows: list[dict]) -> dict:
-    if not manifest_path.is_file():
-        raise FileNotFoundError(f"Manifest not found: {manifest_path}")
-
-    with manifest_path.open("r", encoding="utf-8") as f:
-        manifest = json.load(f)
+def verify_manifest(manifest_dir: Path, dataset_rows: list[dict]) -> dict:
+    manifest = _load_manifest(manifest_dir)
 
     manifest_tasks = manifest.get("tasks", [])
     manifest_ids = {t["instance_id"] for t in manifest_tasks}
@@ -104,8 +112,8 @@ def main() -> int:
     parser.add_argument(
         "--manifest",
         type=Path,
-        default=DEFAULT_MANIFEST_PATH,
-        help="Path to the frozen 50-task manifest.",
+        default=DEFAULT_MANIFEST_DIR,
+        help="Directory holding the frozen 50-task manifest (meta.json + tasks-*.json chunks).",
     )
     parser.add_argument(
         "--output",
@@ -121,11 +129,10 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.verify_only:
-        if not args.manifest.is_file():
+        if not args.manifest.is_dir():
             logger.error("Manifest missing: %s", args.manifest)
             return 1
-        with args.manifest.open("r", encoding="utf-8") as f:
-            data = json.load(f)
+        data = _load_manifest(args.manifest)
         count = len(data.get("tasks", []))
         logger.info("Manifest %s validated: %d tasks present", args.manifest.name, count)
         return 0 if count == 50 else 2

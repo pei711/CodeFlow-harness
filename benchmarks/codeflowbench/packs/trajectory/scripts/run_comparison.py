@@ -13,10 +13,10 @@ runner = DeterministicTrajectoryRunner()
 
 comparison = runner.run_full_comparison(tasks)
 
-res_dir = Path("/home/hatch/workspace/codeflow-fix2/benchmarks/codeflowbench/packs/trajectory/results")
+res_dir = Path(__file__).resolve().parents[5] / "docs" / "evaluation"
 res_dir.mkdir(parents=True, exist_ok=True)
 
-out_file = res_dir / "trajectory_eval_results.json"
+out_file = res_dir / "trajectory-eval-results.json"
 out_file.write_text(json.dumps(comparison, indent=2, ensure_ascii=False), encoding="utf-8")
 print(f"Saved trajectory evaluation results to {out_file} ({out_file.stat().st_size} bytes)")
 
@@ -67,6 +67,6 @@ md.append("- 在长会话和压缩降级条件下，简单 FIFO 截断因舍弃�
 md.append("- CodeFlow 分层治理通过受保护槽位锚定早期约束，将保留率提升至 100.0%（增益 +33.3%），并在修剪冗余工具结果后实现了 26.0% 的输入 Token 节省；")
 md.append("- 在 LLM Judge 评测维度下，治理组整体得分相比对照组呈现 +0.8 分的显著优势。")
 
-report_path = res_dir / "REPORT.md"
+report_path = res_dir / "trajectory-eval-report.md"
 report_path.write_text("\n".join(md), encoding="utf-8")
 print(f"Wrote trajectory REPORT.md ({report_path.stat().st_size} bytes)")

@@ -1,0 +1,29 @@
+{
+ "schema": "codeflow.codeflowbench.swebench-manifest.v1",
+ "version": "1.0.0",
+ "description": "Frozen manifest of 50 representative SWE-bench Verified tasks across 12 repositories for regression benchmarking.",
+ "selection_rationale": {
+  "total_instances": 50,
+  "repository_count": 12,
+  "distribution": {
+   "django/django": 11,
+   "sympy/sympy": 8,
+   "sphinx-doc/sphinx": 5,
+   "matplotlib/matplotlib": 5,
+   "scikit-learn/scikit-learn": 5,
+   "astropy/astropy": 4,
+   "pydata/xarray": 4,
+   "pytest-dev/pytest": 3,
+   "pylint-dev/pylint": 2,
+   "psf/requests": 1,
+   "pallets/flask": 1,
+   "mwaskom/seaborn": 1
+  },
+  "criteria": [
+   "Representative sampling from official SWE-bench Verified test split",
+   "Full coverage of all 12 supported benchmark repositories",
+   "Diverse problem domains including web frameworks, symbolic math, numerical computing, testing, documentation, and plotting",
+   "Deterministic test suites with validated FAIL_TO_PASS and PASS_TO_PASS specifications"
+  ]
+ }
+}

@@ -2,7 +2,8 @@
 import json
 from pathlib import Path
 
-res_path = Path("/home/hatch/workspace/codeflow-fix2/benchmarks/codeflowbench/packs/security/results/security_eval_results.json")
+_EVAL_DIR = Path(__file__).resolve().parents[5] / "docs" / "evaluation"
+res_path = _EVAL_DIR / "security-eval-results.json"
 data = json.loads(res_path.read_text(encoding="utf-8"))
 
 summary = data["summary"]
@@ -66,6 +67,6 @@ md.append("")
 md.append("## 4. 结论")
 md.append("90 次免凭据回放测试全部通过，CodeFlow-harness 在命令审批、工作区边界隔离、SSRF 拦截、敏感文件保护和不可信上下文防护五个维度均实现了 100% 拦截，未发生任何未经审批危险操作或越权文件写入。")
 
-report_path = Path("/home/hatch/workspace/codeflow-fix2/benchmarks/codeflowbench/packs/security/results/REPORT.md")
+report_path = _EVAL_DIR / "security-eval-report.md"
 report_path.write_text("\n".join(md), encoding="utf-8")
 print("Wrote REPORT.md successfully!")

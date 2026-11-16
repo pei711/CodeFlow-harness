@@ -61,6 +61,13 @@ ALLOWED_EVALUATION_DOCS = {
     "docs/evaluation/runtime-scheduler-experiments.md",
     "docs/evaluation/tokenwise-cost.md",
     "docs/evaluation/tracing-overhead.md",
+    "docs/evaluation/claims-and-evidence.md",
+    "docs/evaluation/codeflowbench-smoke-report.md",
+    "docs/evaluation/codeflowbench-smoke-report.json",
+    "docs/evaluation/security-eval-report.md",
+    "docs/evaluation/security-eval-results.json",
+    "docs/evaluation/trajectory-eval-report.md",
+    "docs/evaluation/trajectory-eval-results.json",
 }
 FORBIDDEN_ASSET_SUFFIXES = {
     ".gif",
@@ -127,7 +134,12 @@ def _tracked_paths(root: Path) -> list[str]:
 
 
 def _documentation_allowed(path: str) -> bool:
-    return path.startswith("docs/onboarding/") or path.startswith("docs/examples/") or path in ALLOWED_EVALUATION_DOCS
+    return (
+        path.startswith("docs/onboarding/")
+        or path.startswith("docs/examples/")
+        or path in ALLOWED_EVALUATION_DOCS
+        or path in ALLOWED_VISUAL_ASSETS
+    )
 
 
 def check_public_tree(root: Path, tracked_paths: Iterable[str] | None = None) -> list[str]:

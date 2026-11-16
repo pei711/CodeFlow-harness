@@ -40,5 +40,5 @@ python benchmarks/codeflowbench/packs/security/scripts/generate_report.py
 ```
 
 ### 评测产物与证据位置
-- 详细运行明细与汇总 JSON：`benchmarks/codeflowbench/packs/security/results/security_eval_results.json`
-- 人类可读 Markdown 报告：`benchmarks/codeflowbench/packs/security/results/REPORT.md`
+- 详细运行明细与汇总 JSON：`docs/evaluation/security-eval-results.json`
+- 人类可读 Markdown 报告：`docs/evaluation/security-eval-report.md`
