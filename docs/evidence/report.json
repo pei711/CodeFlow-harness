@@ -1,0 +1,164 @@
+{
+    "claim_eligible": true,
+    "codeflow_commit": "cf642dfa3d51989b886b94b6b02583cf20fcdab8",
+    "cv_metrics": {
+        "runtime.r0.accepted_requests": 2000,
+        "runtime.r0.conversation_count": 64,
+        "runtime.r0.dispatch_overhead_p95_ms": 0.562063,
+        "runtime.r0.execution_latency_p95_ms": 5.02432,
+        "runtime.r0.lifecycle_contradictions": 0,
+        "runtime.r0.lost_requests": 0,
+        "runtime.r0.max_observed_pending_depth": 27,
+        "runtime.r0.peak_system_concurrency": 4,
+        "runtime.r0.peak_user_concurrency": 16,
+        "runtime.r0.pool_limit_violations": 0,
+        "runtime.r0.queue_wait_p95_ms": 601.327435,
+        "runtime.r0.unexpected_duplicate_executions": 0,
+        "runtime.r0.unresolved_handles": 0,
+        "runtime.r1.delivery_counts": {
+            "delivered": 88,
+            "dropped": 2,
+            "no_outlet": 2
+        },
+        "runtime.r1.identity_contradictions": 0,
+        "runtime.r1.lifecycle_contradictions": 0,
+        "runtime.r1.model_calls": 118,
+        "runtime.r1.readable_sessions": 92,
+        "runtime.r1.resources_closed": true,
+        "runtime.r1.runner_type": "AgentTurnRunner",
+        "runtime.r1.submitted_through_scheduler": 100,
+        "runtime.r1.terminal_counts": {
+            "cancelled": 4,
+            "completed": 84,
+            "completed_with_tool_failure": 8,
+            "provider_failed": 4
+        },
+        "runtime.r1.tool_event_turns": 18,
+        "runtime.r1.turns": 100,
+        "runtime.r1.unresolved_handles": 0
+    },
+    "details": {
+        "mcp": {
+            "metrics": {
+                "called_target_name": "mcp_codeflowbench_catalog_probe_00",
+                "catalog_count": 64,
+                "receipt": {
+                    "operation": "inspect",
+                    "receipt": "fd06ad4a16948c90ee78355a0740cfadc5c83a76759ce1bfcb88e255da6e7726",
+                    "resource": "smoke-resource",
+                    "tool": "catalog_probe_00",
+                    "value": 1
+                },
+                "search_hit_name": "mcp_codeflowbench_catalog_probe_00",
+                "transport": "stdio",
+                "transport_closed": true
+            },
+            "passed": true
+        },
+        "r0": {
+            "metrics": {
+                "accepted_requests": 2000,
+                "conversation_count": 64,
+                "dispatch_overhead_ms": {
+                    "count": 16,
+                    "maximum": 0.562063,
+                    "p50": 0.109279,
+                    "p95": 0.562063,
+                    "p99": 0.562063
+                },
+                "evidence_label": "deterministic_scheduler_runtime",
+                "execution_latency_ms": {
+                    "count": 1920,
+                    "maximum": 47.919814,
+                    "p50": 2.0580784999999997,
+                    "p95": 5.02432,
+                    "p99": 45.036486
+                },
+                "fate_counts": {
+                    "cancelled_before_start": 64,
+                    "cancelled_while_running": 32,
+                    "executed": 1872,
+                    "fallback_executed": 16,
+                    "merged_into_running_turn": 16
+                },
+                "lifecycle_contradictions": 0,
+                "lost_requests": 0,
+                "max_observed_pending_depth": 27,
+                "peak_system_concurrency": 4,
+                "peak_user_concurrency": 16,
+                "pool_limit_violations": 0,
+                "queue_wait_ms": {
+                    "count": 1904,
+                    "maximum": 620.722832,
+                    "p50": 296.21451049999996,
+                    "p95": 601.327435,
+                    "p99": 618.220958
+                },
+                "rejected_requests": 64,
+                "rejected_without_handle": 64,
+                "runner_invocations": 1920,
+                "shutdown_cancelled_requests": 64,
+                "unexpected_duplicate_executions": 0,
+                "unresolved_handles": 0
+            },
+            "passed": true
+        },
+        "r1": {
+            "metrics": {
+                "delivery_counts": {
+                    "delivered": 88,
+                    "dropped": 2,
+                    "no_outlet": 2
+                },
+                "evidence_label": "deterministic_benchmark_host_full_path",
+                "identity_contradictions": 0,
+                "lifecycle_contradictions": 0,
+                "model_calls": 118,
+                "readable_sessions": 92,
+                "resources_closed": true,
+                "runner_type": "AgentTurnRunner",
+                "submitted_through_scheduler": 100,
+                "terminal_counts": {
+                    "cancelled": 4,
+                    "completed": 84,
+                    "completed_with_tool_failure": 8,
+                    "provider_failed": 4
+                },
+                "tool_event_turns": 18,
+                "turns": 100,
+                "unresolved_handles": 0
+            },
+            "passed": true
+        },
+        "report_rebuild": {
+            "passed": true
+        }
+    },
+    "environment": {
+        "dependency_lock": {
+            "file": "uv.lock",
+            "sha256": "7029ff3702571a4951a1288f32a229756072b282acc34ddc1b4b6fd7ca294ab9"
+        },
+        "execution": {
+            "configured_backend": "none",
+            "sandbox_identity": "direct_host"
+        },
+        "hardware": {
+            "architecture": "64bit",
+            "machine": "x86_64"
+        },
+        "os": {
+            "release": "7.0.0-44-generic",
+            "system": "Linux"
+        },
+        "python": {
+            "implementation": "CPython",
+            "version": "3.12.3"
+        },
+        "schema": "codeflow.codeflowbench.environment.v1"
+    },
+    "evidence_digest": "11527da52c80b3e9d5e17fe275f284e3b3bffd05685a997686b39aceee13fdfb",
+    "evidence_scope": "deterministic_runtime_only",
+    "schema": "codeflow.codeflowbench.runtime-evidence.v2",
+    "worktree_clean": true
+}
