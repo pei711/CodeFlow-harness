@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Fast Test Suite & Lint (Python 3.12)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          uv sync --frozen --extra dev --dev
+
+      - name: Lint and format check
+        run: |
+          uv run --extra dev ruff check scripts/check_commit_file.py scripts/check_commit_messages.py scripts/check_pr_title.py scripts/check_large_files.py scripts/commit_lint.py tests/test_commit_lint.py tests/test_large_file_check.py
+          uv run --extra dev ruff format --check scripts/check_commit_file.py scripts/check_commit_messages.py scripts/check_pr_title.py scripts/check_large_files.py scripts/commit_lint.py tests/test_commit_lint.py tests/test_large_file_check.py
+
+      - name: Run fast test subset
+        run: |
+          # The full test suite contains 256 test files, many requiring external LLM endpoints,
+          # sandbox VM runners, or lengthy simulations (filtered via markers like real_llm/llm_judge/e2e).
+          # This step runs a deterministic, fast core subset verified locally to pass cleanly under 20s.
+          uv run --extra dev pytest \
+            tests/test_commit_lint.py \
+            tests/test_large_file_check.py \
+            tests/test_cli_smoke.py \
+            tests/test_litellm_setup.py \
+            tests/test_atomic_io.py \
+            tests/test_bm25.py \
+            -q -x
